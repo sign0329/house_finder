@@ -1,0 +1,22 @@
+# Database-only environment for running the app from IntelliJ/Maven.
+# Separate project/volume from compose.yaml and from H2 demo data.
+name: house-finder-postgres
+services:
+  db:
+    image: postgres:17-alpine
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5433}:5432"
+    environment:
+      POSTGRES_DB: apartments
+      POSTGRES_USER: ${DB_USER:-apartments}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env.postgres}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d apartments"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+    restart: unless-stopped
+volumes:
+  pgdata:

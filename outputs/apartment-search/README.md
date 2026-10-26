@@ -2,7 +2,7 @@
 
 지역·가격·면적·계약 기간으로 아파트 거래를 검색하고, 거래 상세와 동일 면적의 가격 흐름을 확인하는 웹 프로젝트입니다.
 
-**현재 단계: 웹 MVP + 국토부 거래 수집 코드 구현. 기본 실행은 가상 거래 240건입니다. 실제 인증키 호출·대용량 성능·클라우드 배포는 아직 검증하지 않았습니다.**
+**현재 단계: 웹 MVP + 실제 국토부 데이터 연결. PostgreSQL에 종로구 2026년 9월 거래 32건을 저장하고 조회를 확인했습니다. 기본 demo는 가상 거래 240건이며, 대용량 성능·클라우드 배포는 미검증입니다.**
 
 공공데이터를 가져오려면 [IntelliJ에서 첫 수집 실행](docs/public-api.md)을 참고하세요. 종로구의 선택한 계약월을 별도 로컬 DB에 저장합니다.
 
@@ -27,9 +27,10 @@
 | 화면 | Thymeleaf, CSS, JavaScript | 구현 |
 | 데이터 접근 | Spring JDBC, Flyway | 구현 |
 | 기본 실행 DB | H2 | 테스트·실행 확인 |
-| 운영 후보 DB | PostgreSQL 17 | 프로필·Compose 준비, 실행 미검증 |
-| 테스트 | JUnit 5, MockMvc | 30개 통과 |
-| 컨테이너 | Docker, Compose | 앱·DB 실행, 실제 수집, 재시작 데이터 유지 확인 |
+| 개발 DB | PostgreSQL 17 | 실제 거래 32건 저장·조회, 통합 테스트 7개 통과 |
+| 테스트 | JUnit 5, MockMvc, Testcontainers | 기본 30개 + PostgreSQL 7개 통과 |
+| CI | GitHub Actions | PR·main의 Java 테스트 실행 확인 |
+| 컨테이너 | Docker, Compose | 앱·DB 실행, 실제 수집, 재시작 후 데이터 유지 확인 |
 | 별도 CI | Jenkinsfile | 설정 준비, 실행 미검증 |
 | 성능 실험 | k6 | 스크립트 준비, 측정 미실시 |
 | 캐시 | Redis | 선택적 Compose 서비스만 준비 |
@@ -94,7 +95,7 @@ SQL과 실행 계획을 직접 관찰할 수 있도록 JDBC를 사용합니다. 
 
 ## 다음 단계
 
-1. 실제 인증키 호출 확인 및 누락 필드 정책 검증
+1. 실제 데이터의 누락 필드 정책 검증과 지역 확장
 2. 전국 지역 확장·정기 수집과 PostgreSQL 통합 테스트
 3. 대량 테스트 데이터 생성과 실행 계획·부하 측정
 4. 인덱스·페이지네이션·캐시 변경 전후 비교
@@ -127,3 +128,6 @@ sh scripts/stack.sh import
 http://localhost:8082 접속. 키는 일회성 수집 컨테이너에만 전달하며 앱과 DB는 함께 실행됩니다. 이미 `.env.docker`가 있으면 복사하지 말고 기존 설정을 사용하세요.
 
 [전체 Docker 실행·종료·데이터 유지 안내](docs/docker.md)
+## PostgreSQL 개발 환경
+
+[PostgreSQL 실행 및 테스트 안내](docs/postgresql.md). Docker의 전용 DB를 5433 포트에 실행하고 IntelliJ 앱을 8081 포트로 연결할 수 있습니다. 기본 H2 실행과 별도이며, `sh scripts/test-postgres.sh`로 실제 PostgreSQL 통합 테스트를 실행합니다.

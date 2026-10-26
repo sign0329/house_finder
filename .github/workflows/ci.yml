@@ -56,4 +56,4 @@ jobs:
         if: always()
         env:
           DB_PASSWORD: disposable-ci-database
-        run: docker compose down --volumes
+         run: sh ./mvnw -B -ntp -Ppostgres-it clean verify

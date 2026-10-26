@@ -48,7 +48,7 @@ GitHub에서 작업 브랜치 → main PR을 만든다. PR 템플릿에 변경 �
 
 ## CI 범위
 
-`.github/workflows/ci.yml`은 main 대상 PR과 main 푸시마다 Ubuntu + Temurin 21에서 Maven clean verify를 실행한다. 경로 필터를 두지 않아 문서 PR도 필수 검사가 생성된다. 공공 API 키를 CI에 넣지 않으며 테스트는 H2/합성 XML/모의 HTTP를 사용한다. PostgreSQL·Docker·실제 API 호출까지 보장하지 않는다.
+`.github/workflows/ci.yml`은 main 대상 PR과 main 푸시마다 Ubuntu + Temurin 21에서 Maven clean verify를 실행한다. 경로 필터를 두지 않아 문서 PR도 필수 검사가 생성된다. 공공 API 키를 CI에 넣지 않으며 테스트는 H2/합성 XML/모의 HTTP와 Testcontainers PostgreSQL 17을 사용한다. `-Ppostgres-it` 프로필의 PostgreSQL 테스트도 필수 검사에 포함하며, Docker가 없으면 실패한다. 전체 앱 Docker 배포와 실제 API 호출까지 보장하지 않는다.
 
 Actions는 읽기 권한으로 실행하며 외부 액션은 커밋 SHA로 고정한다. Jenkinsfile은 별도 준비 설정이고 GitHub 필수 검사는 GitHub Actions가 담당한다.
 
