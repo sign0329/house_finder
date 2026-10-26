@@ -12,3 +12,6 @@
 - Never commit credentials or .env; do not weaken tests to make CI green.
 - Report tests actually executed and environment limitations.
 - No deployment, paid resources or API collection are required by the current scope.
+
+- Follow the repository-root CONTRIBUTING.md: use a task branch, open a PR targeting main, and merge only after Java tests passes. Never push changes directly to main or bypass protection.
+- Stage explicit project files; preserve unrelated staged IDE/local changes.

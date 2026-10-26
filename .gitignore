@@ -1,0 +1,19 @@
+# Personal configuration, local collections, and temporary generation artifacts
+.idea/
+.run/
+work/
+data/
+*.zip
+.env
+.env.*
+!.env.example
+**/.tools/
+**/.m2/
+**/target/
+**/data/
+*.mv.db
+*.trace.db
+*.log
+.DS_Store
+
+# Rules do not untrack files already committed. Do not stage existing IDE changes.
