@@ -41,3 +41,7 @@ AWS 배포 후보: EC2 + Docker, 필요에 따라 RDS 분리. 리소스는 생�
 ## 공공데이터 수집 경로
 
 MolitImportRunner → MolitClient(HTTPS/페이지 검증) → MolitXml → MolitStore(트랜잭션). molit 프로필은 별도 파일 H2를 사용한다. 조회는 기존 SearchService를 재사용한다. V2는 수집 식별자·월·스냅샷·성공 시각, V3는 면적 소수 정밀도를 추가한다. [수집 정책과 한계](public-api.md)를 참고한다.
+
+## PostgreSQL 검증 환경
+
+`compose.postgres.yaml`은 IntelliJ 앱을 위한 전용 PostgreSQL 개발 DB다. Testcontainers 통합 테스트는 개발 DB를 사용하지 않고 새 PostgreSQL 17 컨테이너를 임의 포트로 만들고 정리한다. Maven `postgres-it` 프로필에서 Failsafe를 실행하며 Docker가 없으면 실패한다. CI의 필수 Java tests에 이 프로필을 포함한다.

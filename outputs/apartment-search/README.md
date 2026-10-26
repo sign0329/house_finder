@@ -2,7 +2,7 @@
 
 지역·가격·면적·계약 기간으로 아파트 거래를 검색하고, 거래 상세와 동일 면적의 가격 흐름을 확인하는 웹 프로젝트입니다.
 
-**현재 단계: 웹 MVP + 국토부 공공데이터 연결 확인. 종로구 2026년 9월 거래 32건의 저장·검색·상세 조회를 확인했습니다(2026-10-26). 기본 demo 실행은 가상 데이터이며, 실제 데이터는 molit 프로필에서 조회합니다. 대용량 성능과 클라우드 배포는 미검증입니다.**
+**현재 단계: 웹 MVP + 실제 국토부 데이터 연결. PostgreSQL에 종로구 2026년 9월 거래 32건을 저장하고 조회를 확인했습니다. 기본 demo는 가상 거래 240건이며, 대용량 성능·클라우드 배포는 미검증입니다.**
 
 공공데이터를 가져오려면 [IntelliJ에서 첫 수집 실행](docs/public-api.md)을 참고하세요. 종로구의 선택한 계약월을 별도 로컬 DB에 저장합니다.
 
@@ -27,10 +27,9 @@
 | 화면 | Thymeleaf, CSS, JavaScript | 구현 |
 | 데이터 접근 | Spring JDBC, Flyway | 구현 |
 | 기본 실행 DB | H2 | 테스트·실행 확인 |
-| 운영 후보 DB | PostgreSQL 17 | 프로필·Compose 준비, 실행 미검증 |
-| 테스트 | JUnit 5, MockMvc | 30개 통과 |
-| CI | GitHub Actions | PR·main의 Java 테스트 실행 확인 |
-| 컨테이너·별도 CI | Docker, Compose, Jenkinsfile | 설정 준비, 실행 미검증 |
+| 개발 DB | PostgreSQL 17 | 실제 거래 32건 저장·조회, 통합 테스트 7개 통과 |
+| 테스트 | JUnit 5, MockMvc, Testcontainers | 기본 30개 + PostgreSQL 7개 통과 |
+| 컨테이너·CI | Docker, Compose, Jenkinsfile | 설정 준비, 실행 미검증 |
 | 성능 실험 | k6 | 스크립트 준비, 측정 미실시 |
 | 캐시 | Redis | 선택적 Compose 서비스만 준비 |
 
@@ -112,3 +111,7 @@ SQL과 실행 계획을 직접 관찰할 수 있도록 JDBC를 사용합니다. 
 - [작업 규칙](AGENTS.md)
 
 AI 코딩 도구를 활용해 구현하고 테스트·실행 결과로 변경을 검증했습니다. 초기 구현 전체를 TDD로 주장하지 않으며, 보안 보완에서는 신규 테스트 3개의 실패를 확인한 뒤 수정한 기록이 있습니다.
+
+## PostgreSQL 개발 환경
+
+[PostgreSQL 실행 및 테스트 안내](docs/postgresql.md). Docker의 전용 DB를 5433 포트에 실행하고 IntelliJ 앱을 8081 포트로 연결할 수 있습니다. 기본 H2 실행과 별도이며, `sh scripts/test-postgres.sh`로 실제 PostgreSQL 통합 테스트를 실행합니다.

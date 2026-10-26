@@ -35,4 +35,4 @@ jobs:
           cache: maven
           cache-dependency-path: outputs/apartment-search/pom.xml
       - name: Build and test without public API credentials
-        run: sh ./mvnw -B -ntp clean verify
+        run: sh ./mvnw -B -ntp -Ppostgres-it clean verify
