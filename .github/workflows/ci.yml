@@ -18,7 +18,7 @@ jobs:
   test:
     name: Java tests
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: outputs/apartment-search
@@ -36,3 +36,24 @@ jobs:
           cache-dependency-path: outputs/apartment-search/pom.xml
       - name: Build and test without public API credentials
         run: sh ./mvnw -B -ntp clean verify
+      - name: Build and start container stack with synthetic data
+        env:
+          DB_PASSWORD: disposable-ci-database
+          DEMO_DATA: 'true'
+          PORT: '8082'
+        run: docker compose up -d --build --wait app
+      - name: Verify container search and restart persistence
+        env:
+          DB_PASSWORD: disposable-ci-database
+          DEMO_DATA: 'true'
+          PORT: '8082'
+        run: |
+          curl --fail --silent http://127.0.0.1:8082/api/trades | python3 -c 'import json,sys; assert json.load(sys.stdin)["total"] == 240'
+          docker compose restart app
+          docker compose up -d --wait app
+          curl --fail --silent http://127.0.0.1:8082/api/trades | python3 -c 'import json,sys; assert json.load(sys.stdin)["total"] == 240'
+      - name: Stop disposable CI stack
+        if: always()
+        env:
+          DB_PASSWORD: disposable-ci-database
+        run: docker compose down --volumes

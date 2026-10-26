@@ -15,3 +15,5 @@
 
 - Follow the repository-root CONTRIBUTING.md: use a task branch, open a PR targeting main, and merge only after Java tests passes. Never push changes directly to main or bypass protection.
 - Stage explicit project files; preserve unrelated staged IDE/local changes.
+
+- User testing preference: for environment/setup/install work, focus additional verification on the three highest-risk cases; for other non-core features use at most five cases. Preserve existing mandatory CI tests. Core features retain the necessary coverage.

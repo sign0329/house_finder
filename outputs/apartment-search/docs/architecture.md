@@ -41,3 +41,7 @@ AWS 배포 후보: EC2 + Docker, 필요에 따라 RDS 분리. 리소스는 생�
 ## 공공데이터 수집 경로
 
 MolitImportRunner → MolitClient(HTTPS/페이지 검증) → MolitXml → MolitStore(트랜잭션). molit 프로필은 별도 파일 H2를 사용한다. 조회는 기존 SearchService를 재사용한다. V2는 수집 식별자·월·스냅샷·성공 시각, V3는 면적 소수 정밀도를 추가한다. [수집 정책과 한계](public-api.md)를 참고한다.
+
+## 전체 컨테이너 구성
+
+`compose.yaml`의 house-finder-stack은 app과 db를 함께 실행하며 별도 pgdata 볼륨을 사용한다. 호스트에는 앱 포트만 노출한다(기본 8082). 공공 API 수집은 tools 프로필의 일회성 importer가 담당하여 일반 앱 재시작과 외부 API 호출을 분리한다.
