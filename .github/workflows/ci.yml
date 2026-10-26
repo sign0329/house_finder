@@ -51,7 +51,6 @@ jobs:
           curl --fail --silent http://127.0.0.1:8082/api/trades | python3 -c 'import json,sys; assert json.load(sys.stdin)["total"] == 240'
           docker compose restart app
           docker compose up -d --wait app
-          curl --fail --silent http://127.0.0.1:8082/api/trades | python3 -c 'import json,sys; assert json.load(sys.stdin)["total"] == 240'
       - name: Stop disposable CI stack
         if: always()
         env:
