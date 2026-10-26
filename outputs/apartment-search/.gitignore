@@ -6,3 +6,18 @@ target/
 *.iml
 .DS_Store
 load-results/
+
+# Local secrets, generated artifacts and personal files
+.env.*
+!.env.example
+*.log
+*.zip
+__pycache__/
+*.pyc
+.vscode/
+work/
+
+# Local collected data
+data/
+*.mv.db
+*.trace.db

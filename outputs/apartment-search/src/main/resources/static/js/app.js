@@ -1,6 +1,7 @@
 (() => {
  document.getElementById('search-sort')?.addEventListener('change', event => event.target.form.requestSubmit());
- const STORE='aptfolio.saved.v1'; let entries=[];
+ const dataset=document.querySelector('[data-dataset]')?.dataset.dataset;
+ const STORE=dataset==='molit'?'aptfolio.saved.molit.v1':'aptfolio.saved.v1'; let entries=[];
  try {const raw=JSON.parse(localStorage.getItem(STORE)||'[]');if(Array.isArray(raw))entries=raw.filter(x=>x&&typeof x.key==='string'&&Number.isSafeInteger(Number(x.id))&&Number(x.id)>0&&typeof x.name==='string'&&typeof x.location==='string');}catch{}
  const toast=(text)=>{const el=document.getElementById('toast');if(!el)return;el.textContent=text;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200);};
  const persist=()=>{try{localStorage.setItem(STORE,JSON.stringify(entries));return true;}catch{toast('브라우저 저장 공간을 사용할 수 없어요.');return false;}};

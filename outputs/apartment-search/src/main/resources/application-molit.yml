@@ -1,0 +1,13 @@
+# Persistent local database, isolated from the generated demo data.
+spring:
+  datasource:
+    url: jdbc:h2:file:./data/molit;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE
+    username: sa
+    password:
+app:
+  demo: false
+server:
+  address: 127.0.0.1
+molit:
+  import-on-start: false
+  month: '202609'

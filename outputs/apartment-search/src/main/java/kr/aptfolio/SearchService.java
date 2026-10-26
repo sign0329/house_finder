@@ -45,6 +45,12 @@ public class SearchService {
   if(in.getOrDefault(key,"").isBlank())return null;
   try{return LocalDate.parse(in.get(key));}catch(Exception e){throw new IllegalArgumentException("날짜 형식을 확인해주세요.");}
  }
+ public String dataNotice() {
+  var rows=db.queryForList("select last_month, updated_at from molit_import_state where id=1",Map.of());
+  if(rows.isEmpty()||rows.getFirst().get("updated_at")==null)return "아직 수집된 공공데이터가 없습니다.";
+  var row=rows.getFirst();
+  return "출처: 국토교통부 · 종로구 · 최근 수집 계약월 "+row.get("last_month")+" · 수집 시각 "+row.get("updated_at")+" (서버 시간) · 신고·정정에 따라 변경될 수 있습니다.";
+ }
  public Optional<Trade> find(long id){return db.query("select * from trade where id=:id",Map.of("id",id),ROW).stream().findFirst();}
  public List<Trade> history(Trade t){return db.query("select * from trade where region=:r and district=:d and apartment=:a and address=:s and area=:area order by deal_date desc,id desc limit 12",Map.of("r",t.region(),"d",t.district(),"a",t.apartment(),"s",t.address(),"area",t.area()),ROW);}
 }

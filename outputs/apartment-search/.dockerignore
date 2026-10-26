@@ -5,3 +5,8 @@ target
 .env
 .idea
 load-results
+
+data
+.env.*
+*.mv.db
+*.trace.db
