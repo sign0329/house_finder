@@ -1,0 +1,260 @@
+11:04:17.461 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [kr.aptfolio.SecurityTest]: SecurityTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+11:04:17.552 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration kr.aptfolio.ApartmentApplication for test class kr.aptfolio.SecurityTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.5.7)
+
+2026-10-26T11:04:17.866+09:00  INFO 4128 --- [apartment-search] [           main] kr.aptfolio.SecurityTest                 : Starting SecurityTest using Java 22.0.2 with PID 4128 (started by sangminkim in /Users/sangminkim/Documents/Codex/2026-10-09/new-chat/outputs/apartment-search)
+2026-10-26T11:04:17.867+09:00  INFO 4128 --- [apartment-search] [           main] kr.aptfolio.SecurityTest                 : No active profile set, falling back to 1 default profile: "demo"
+2026-10-26T11:04:18.600+09:00  INFO 4128 --- [apartment-search] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-10-26T11:04:18.724+09:00  INFO 4128 --- [apartment-search] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:apartments user=SA
+2026-10-26T11:04:18.725+09:00  INFO 4128 --- [apartment-search] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-10-26T11:04:18.754+09:00  INFO 4128 --- [apartment-search] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:apartments (H2 2.3)
+2026-10-26T11:04:18.775+09:00  INFO 4128 --- [apartment-search] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "public"."flyway_schema_history" does not exist yet
+2026-10-26T11:04:18.777+09:00  INFO 4128 --- [apartment-search] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 1 migration (execution time 00:00.008s)
+2026-10-26T11:04:18.782+09:00  INFO 4128 --- [apartment-search] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "public"."flyway_schema_history" ...
+2026-10-26T11:04:18.804+09:00  INFO 4128 --- [apartment-search] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": << Empty Schema >>
+2026-10-26T11:04:18.809+09:00  INFO 4128 --- [apartment-search] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "1 - create trade"
+2026-10-26T11:04:18.822+09:00  INFO 4128 --- [apartment-search] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 1 migration to schema "public", now at version v1 (execution time 00:00.005s)
+2026-10-26T11:04:18.967+09:00  INFO 4128 --- [apartment-search] [           main] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page template: index
+2026-10-26T11:04:19.250+09:00  INFO 4128 --- [apartment-search] [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-10-26T11:04:19.250+09:00  INFO 4128 --- [apartment-search] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-10-26T11:04:19.254+09:00  INFO 4128 --- [apartment-search] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-10-26T11:04:19.263+09:00  INFO 4128 --- [apartment-search] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 12 ms
+2026-10-26T11:04:19.304+09:00  INFO 4128 --- [apartment-search] [           main] kr.aptfolio.SecurityTest                 : Started SecurityTest in 1.672 seconds (process running for 2.277)
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+
+MockHttpServletRequest:
+      HTTP Method = GET
+      Request URI = /
+       Parameters = {}
+          Headers = []
+             Body = null
+    Session Attrs = {}
+
+Handler:
+             Type = kr.aptfolio.WebController
+           Method = kr.aptfolio.WebController#home(Map, Model)
+
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = null
+
+ModelAndView:
+        View name = index
+             View = null
+        Attribute = demo
+            value = true
+        Attribute = regions
+            value = [서울, 경기, 부산, 대전, 대구]
+        Attribute = result
+            value = Results[items=[Trade[id=1, region=서울, district=마포구, apartment=한강 포레스트, address=마포구 샘플로 12, area=59.98, floor=23, builtYear=2010, dealDate=2026-10-12, price=124800], Trade[id=2, region=서울, district=성동구, apartment=서울숲 리버뷰, address=성동구 샘플길 24, area=84.95, floor=21, builtYear=2011, dealDate=2026-10-10, price=106400], Trade[id=3, region=서울, district=강동구, apartment=고덕 그린파크, address=강동구 샘플로 35, area=114.72, floor=27, builtYear=2012, dealDate=2026-10-08, price=100000], Trade[id=4, region=경기, district=수원시, apartment=광교 레이크힐, address=수원시 샘플길 42, area=59.98, floor=2, builtYear=2013, dealDate=2026-10-06, price=88800], Trade[id=5, region=경기, district=성남시, apartment=판교 센트럴, address=성남시 샘플로 8, area=84.95, floor=28, builtYear=2014, dealDate=2026-10-04, price=75800], Trade[id=6, region=부산, district=해운대구, apartment=해운대 오션시티, address=해운대구 샘플길 17, area=114.72, floor=11, builtYear=2015, dealDate=2026-10-02, price=66200], Trade[id=7, region=대전, district=유성구, apartment=유성 온빛마을, address=유성구 샘플로 21, area=59.98, floor=1, builtYear=2016, dealDate=2026-09-30, price=54700], Trade[id=8, region=대구, district=수성구, apartment=수성 더테라스, address=수성구 샘플길 33, area=84.95, floor=9, builtYear=2017, dealDate=2026-09-28, price=38200], Trade[id=9, region=서울, district=마포구, apartment=한강 포레스트, address=마포구 샘플로 12, area=114.72, floor=1, builtYear=2018, dealDate=2026-09-26, price=125500], Trade[id=10, region=서울, district=성동구, apartment=서울숲 리버뷰, address=성동구 샘플길 24, area=59.98, floor=8, builtYear=2019, dealDate=2026-09-24, price=98900], Trade[id=11, region=서울, district=강동구, apartment=고덕 그린파크, address=강동구 샘플로 35, area=84.95, floor=13, builtYear=2020, dealDate=2026-09-22, price=93800], Trade[id=12, region=경기, district=수원시, apartment=광교 레이크힐, address=수원시 샘플길 42, area=114.72, floor=23, builtYear=2021, dealDate=2026-09-20, price=88300]], total=240, page=0, pages=20]
+           errors = []
+        Attribute = filters
+            value = {}
+        Attribute = previous
+            value = /?page=0
+        Attribute = next
+            value = /?page=1
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = [Content-Language:"en", Content-Type:"text/html;charset=UTF-8"]
+     Content type = text/html;charset=UTF-8
+             Body = <!DOCTYPE html><html lang="ko"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>실거래가 탐색 · 집결</title>
+<link rel="stylesheet" href="/css/app.css"><script defer src="/js/app.js"></script></head><body>
+<header class="header"><a class="brand" href="/"><span class="brand-icon">집</span>집결<span class="brand-sub">살 곳을 알아가는 기준</span></a><nav aria-label="주요 메뉴"><a href="/" class="active">실거래가 탐색</a><a href="/saved">관심 아파트 <span id="saved-count" class="count">0</span></a></nav><span class="mode">PORTFOLIO DEMO</span></header><main class="shell">
+<section class="hero"><div><div class="eyebrow"><span></span> APARTMENT INSIGHT</div><h1>내가 찾는 집,<br><em>거래의 흐름</em>부터.</h1><p>지역과 가격으로 좁혀보고, 실제 거래 기록으로 비교하세요.</p></div><div class="hero-art" aria-hidden="true"><div class="orbit"></div><div class="building b1"></div><div class="building b2"></div><div class="building b3"></div><span class="art-label">A BETTER PLACE TO CALL HOME</span></div></section>
+<div class="notice"><span class="notice-dot"></span><b>데모 둘러보기</b><span>가상 거래 데이터 240건으로 검색과 상세 화면을 체험할 수 있어요. 실제 시세가 아닙니다.</span></div>
+<form method="get" action="/" class="search-panel"><div class="search-top"><label class="search-input"><span aria-hidden="true">⌕</span><input name="q" value="" placeholder="아파트명 또는 시·군·구를 검색하세요" aria-label="아파트명 또는 지역명"></label><button class="primary" type="submit">실거래가 검색 <span>↗</span></button></div>
+<div class="filters"><label>지역<select name="region"><option value="">전체 지역</option><option value="서울">서울</option><option value="경기">경기</option><option value="부산">부산</option><option value="대전">대전</option><option value="대구">대구</option></select></label>
+<label>전용면적<select name="area"><option value="">전체 면적</option><option value="small">60㎡ 미만</option><option value="medium">60–85㎡</option><option value="large">85㎡ 초과</option></select></label>
+<label>최소 가격 · 만원<input type="number" min="0" name="minPrice" placeholder="제한 없음" value=""></label><label>최대 가격 · 만원<input type="number" min="0" name="maxPrice" placeholder="제한 없음" value=""></label>
+<label>계약 시작일<input type="date" name="from" value=""></label><label>계약 종료일<input type="date" name="to" value=""></label></div>
+<div class="filter-bottom"><span>가격은 만원 단위로 입력해요. 예: 5억원 → 50000</span><a href="/">조건 초기화 ↺</a></div>
+<div class="results-top"><h2>거래 내역 <span>240</span></h2><select name="sort" aria-label="정렬" onchange="this.form.requestSubmit()"><option value="recent">최근 계약순</option><option value="priceAsc">낮은 가격순</option><option value="priceDesc">높은 가격순</option></select></div></form>
+<div class="results-layout"><section aria-label="거래 검색 결과"><div class="table-wrap"><table><thead><tr><th>아파트 / 지역</th><th>거래금액</th><th>전용면적 / 층</th><th>계약일</th><th><span class="sr-only">관심 등록</span></th></tr></thead><tbody><tr><td><a class="apt-name" href="/trades/1">한강 포레스트</a><span class="sub">서울 마포구</span></td><td><strong class="price">12억 4,800만</strong><span class="sub">매매</span></td><td><span>59.98㎡</span><span class="sub">23층</span></td><td class="date">2026-10-12</td><td><button type="button" class="bookmark" aria-label="관심 아파트 등록" aria-pressed="false" data-key="서울|마포구|한강 포레스트|마포구 샘플로 12" data-id="1" data-name="한강 포레스트" data-location="서울 마포구">☆</button></td></tr><tr><td><a class="apt-name" href="/trades/2">서울숲 리버뷰</a><span class="sub">서울 성동구</span></td><td><strong class="price">10억 6,400만</strong><span class="sub">매매</span></td><td><span>84.95㎡</span><span class="sub">21층</span></td><td class="date">2026-10-10</td><td><button type="button" class="bookmark" aria-label="관심 아파트 등록" aria-pressed="false" data-key="서울|성동구|서울숲 리버뷰|성동구 샘플길 24" data-id="2" data-name="서울숲 리버뷰" data-location="서울 성동구">☆</button></td></tr><tr><td><a class="apt-name" href="/trades/3">고덕 그린파크</a><span class="sub">서울 강동구</span></td><td><strong class="price">10억</strong><span class="sub">매매</span></td><td><span>114.72㎡</span><span class="sub">27층</span></td><td class="date">2026-10-08</td><td><button type="button" class="bookmark" aria-label="관심 아파트 등록" aria-pressed="false" data-key="서울|강동구|고덕 그린파크|강동구 샘플로 35" data-id="3" data-name="고덕 그린파크" data-location="서울 강동구">☆</button></td></tr><tr><td><a class="apt-name" href="/trades/4">광교 레이크힐</a><span class="sub">경기 수원시</span></td><td><strong class="price">8억 8,800만</strong><span class="sub">매매</span></td><td><span>59.98㎡</span><span class="sub">2층</span></td><td class="date">2026-10-06</td><td><button type="button" class="bookmark" aria-label="관심 아파트 등록" aria-pressed="false" data-key="경기|수원시|광교 레이크힐|수원시 샘플길 42" data-id="4" data-name="광교 레이크힐" data-location="경기 수원시">☆</button></td></tr><tr><td><a class="apt-name" href="/trades/5">판교 센트럴</a><span class="sub">경기 성남시</span></td><td><strong class="price">7억 5,800만</strong><span class="sub">매매</span></td><td><span>84.95㎡</span><span class="sub">28층</span></td><td class="date">2026-10-04</td><td><button type="button" class="bookmark" aria-label="관심 아파트 등록" aria-pressed="false" data-key="경기|성남시|판교 센트럴|성남시 샘플로 8" data-id="5" data-name="판교 센트럴" data-location="경기 성남시">☆</button></td></tr><tr><td><a class="apt-name" href="/trades/6">해운대 오션시티</a><span class="sub">부산 해운대구</span></td><td><strong class="price">6억 6,200만</strong><span class="sub">매매</span></td><td><span>114.72㎡</span><span class="sub">11층</span></td><td class="date">2026-10-02</td><td><button type="button" class="bookmark" aria-label="관심 아파트 등록" aria-pressed="false" data-key="부산|해운대구|해운대 오션시티|해운대구 샘플길 17" data-id="6" data-name="해운대 오션시티" data-location="부산 해운대구">☆</button></td></tr><tr><td><a class="apt-name" href="/trades/7">유성 온빛마을</a><span class="sub">대전 유성구</span></td><td><strong class="price">5억 4,700만</strong><span class="sub">매매</span></td><td><span>59.98㎡</span><span class="sub">1층</span></td><td class="date">2026-09-30</td><td><button type="button" class="bookmark" aria-label="관심 아파트 등록" aria-pressed="false" data-key="대전|유성구|유성 온빛마을|유성구 샘플로 21" data-id="7" data-name="유성 온빛마을" data-location="대전 유성구">☆</button></td></tr><tr><td><a class="apt-name" href="/trades/8">수성 더테라스</a><span class="sub">대구 수성구</span></td><td><strong class="price">3억 8,200만</strong><span class="sub">매매</span></td><td><span>84.95㎡</span><span class="sub">9층</span></td><td class="date">2026-09-28</td><td><button type="button" class="bookmark" aria-label="관심 아파트 등록" aria-pressed="false" data-key="대구|수성구|수성 더테라스|수성구 샘플길 33" data-id="8" data-name="수성 더테라스" data-location="대구 수성구">☆</button></td></tr><tr><td><a class="apt-name" href="/trades/9">한강 포레스트</a><span class="sub">서울 마포구</span></td><td><strong class="price">12억 5,500만</strong><span class="sub">매매</span></td><td><span>114.72㎡</span><span class="sub">1층</span></td><td class="date">2026-09-26</td><td><button type="button" class="bookmark" aria-label="관심 아파트 등록" aria-pressed="false" data-key="서울|마포구|한강 포레스트|마포구 샘플로 12" data-id="9" data-name="한강 포레스트" data-location="서울 마포구">☆</button></td></tr><tr><td><a class="apt-name" href="/trades/10">서울숲 리버뷰</a><span class="sub">서울 성동구</span></td><td><strong class="price">9억 8,900만</strong><span class="sub">매매</span></td><td><span>59.98㎡</span><span class="sub">8층</span></td><td class="date">2026-09-24</td><td><button type="button" class="bookmark" aria-label="관심 아파트 등록" aria-pressed="false" data-key="서울|성동구|서울숲 리버뷰|성동구 샘플길 24" data-id="10" data-name="서울숲 리버뷰" data-location="서울 성동구">☆</button></td></tr><tr><td><a class="apt-name" href="/trades/11">고덕 그린파크</a><span class="sub">서울 강동구</span></td><td><strong class="price">9억 3,800만</strong><span class="sub">매매</span></td><td><span>84.95㎡</span><span class="sub">13층</span></td><td class="date">2026-09-22</td><td><button type="button" class="bookmark" aria-label="관심 아파트 등록" aria-pressed="false" data-key="서울|강동구|고덕 그린파크|강동구 샘플로 35" data-id="11" data-name="고덕 그린파크" data-location="서울 강동구">☆</button></td></tr><tr><td><a class="apt-name" href="/trades/12">광교 레이크힐</a><span class="sub">경기 수원시</span></td><td><strong class="price">8억 8,300만</strong><span class="sub">매매</span></td><td><span>114.72㎡</span><span class="sub">23층</span></td><td class="date">2026-09-20</td><td><button type="button" class="bookmark" aria-label="관심 아파트 등록" aria-pressed="false" data-key="경기|수원시|광교 레이크힐|수원시 샘플길 42" data-id="12" data-name="광교 레이크힐" data-location="경기 수원시">☆</button></td></tr></tbody></table>
+</div>
+<nav class="pagination" aria-label="결과 페이지"><span>1 / 20</span><a href="/?page=1">다음 →</a></nav></section>
+<aside><div class="guide-card"><span class="eyebrow">SEARCH GUIDE</span><h3>숫자 너머의<br>집을 살펴보세요.</h3><p>같은 아파트도 면적과 층, 계약 시점에 따라 거래금액이 달라져요.</p><div class="guide-line"></div><span class="guide-number">01</span><b>같은 면적으로 비교</b><p>전용면적을 맞추면 가격 흐름이 더 선명하게 보여요.</p><span class="guide-number">02</span><b>거래 날짜 확인</b><p>아파트명을 눌러 같은 면적의 최근 거래를 확인해보세요.</p></div><div class="small-note">관심 아파트는 현재 브라우저에 저장됩니다.</div></aside></div>
+</main><footer class="footer"><span><b>집결</b> &nbsp; 집을 고르는 일, 데이터에서 시작하세요.</span><span>가상 거래 데이터 · 실제 시세가 아닙니다</span></footer><div id="toast" role="status" aria-live="polite"></div></body></html>
+
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+
+MockHttpServletRequest:
+      HTTP Method = GET
+      Request URI = /api/trades
+       Parameters = {}
+          Headers = []
+             Body = null
+    Session Attrs = {}
+
+Handler:
+             Type = kr.aptfolio.WebController
+           Method = kr.aptfolio.WebController#api(Map)
+
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = null
+
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = [Content-Type:"application/json"]
+     Content type = application/json
+             Body = {"items":[{"id":1,"region":"서울","district":"마포구","apartment":"한강 포레스트","address":"마포구 샘플로 12","area":59.98,"floor":23,"builtYear":2010,"dealDate":"2026-10-12","price":124800},{"id":2,"region":"서울","district":"성동구","apartment":"서울숲 리버뷰","address":"성동구 샘플길 24","area":84.95,"floor":21,"builtYear":2011,"dealDate":"2026-10-10","price":106400},{"id":3,"region":"서울","district":"강동구","apartment":"고덕 그린파크","address":"강동구 샘플로 35","area":114.72,"floor":27,"builtYear":2012,"dealDate":"2026-10-08","price":100000},{"id":4,"region":"경기","district":"수원시","apartment":"광교 레이크힐","address":"수원시 샘플길 42","area":59.98,"floor":2,"builtYear":2013,"dealDate":"2026-10-06","price":88800},{"id":5,"region":"경기","district":"성남시","apartment":"판교 센트럴","address":"성남시 샘플로 8","area":84.95,"floor":28,"builtYear":2014,"dealDate":"2026-10-04","price":75800},{"id":6,"region":"부산","district":"해운대구","apartment":"해운대 오션시티","address":"해운대구 샘플길 17","area":114.72,"floor":11,"builtYear":2015,"dealDate":"2026-10-02","price":66200},{"id":7,"region":"대전","district":"유성구","apartment":"유성 온빛마을","address":"유성구 샘플로 21","area":59.98,"floor":1,"builtYear":2016,"dealDate":"2026-09-30","price":54700},{"id":8,"region":"대구","district":"수성구","apartment":"수성 더테라스","address":"수성구 샘플길 33","area":84.95,"floor":9,"builtYear":2017,"dealDate":"2026-09-28","price":38200},{"id":9,"region":"서울","district":"마포구","apartment":"한강 포레스트","address":"마포구 샘플로 12","area":114.72,"floor":1,"builtYear":2018,"dealDate":"2026-09-26","price":125500},{"id":10,"region":"서울","district":"성동구","apartment":"서울숲 리버뷰","address":"성동구 샘플길 24","area":59.98,"floor":8,"builtYear":2019,"dealDate":"2026-09-24","price":98900},{"id":11,"region":"서울","district":"강동구","apartment":"고덕 그린파크","address":"강동구 샘플로 35","area":84.95,"floor":13,"builtYear":2020,"dealDate":"2026-09-22","price":93800},{"id":12,"region":"경기","district":"수원시","apartment":"광교 레이크힐","address":"수원시 샘플길 42","area":114.72,"floor":23,"builtYear":2021,"dealDate":"2026-09-20","price":88300}],"total":240,"page":0,"pages":20}
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+
+MockHttpServletRequest:
+      HTTP Method = GET
+      Request URI = /api/trades
+       Parameters = {}
+          Headers = []
+             Body = null
+    Session Attrs = {}
+
+Handler:
+             Type = kr.aptfolio.WebController
+           Method = kr.aptfolio.WebController#api(Map)
+
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = null
+
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = [Content-Type:"application/json"]
+     Content type = application/json
+             Body = {"items":[{"id":1,"region":"서울","district":"마포구","apartment":"한강 포레스트","address":"마포구 샘플로 12","area":59.98,"floor":23,"builtYear":2010,"dealDate":"2026-10-12","price":124800},{"id":2,"region":"서울","district":"성동구","apartment":"서울숲 리버뷰","address":"성동구 샘플길 24","area":84.95,"floor":21,"builtYear":2011,"dealDate":"2026-10-10","price":106400},{"id":3,"region":"서울","district":"강동구","apartment":"고덕 그린파크","address":"강동구 샘플로 35","area":114.72,"floor":27,"builtYear":2012,"dealDate":"2026-10-08","price":100000},{"id":4,"region":"경기","district":"수원시","apartment":"광교 레이크힐","address":"수원시 샘플길 42","area":59.98,"floor":2,"builtYear":2013,"dealDate":"2026-10-06","price":88800},{"id":5,"region":"경기","district":"성남시","apartment":"판교 센트럴","address":"성남시 샘플로 8","area":84.95,"floor":28,"builtYear":2014,"dealDate":"2026-10-04","price":75800},{"id":6,"region":"부산","district":"해운대구","apartment":"해운대 오션시티","address":"해운대구 샘플길 17","area":114.72,"floor":11,"builtYear":2015,"dealDate":"2026-10-02","price":66200},{"id":7,"region":"대전","district":"유성구","apartment":"유성 온빛마을","address":"유성구 샘플로 21","area":59.98,"floor":1,"builtYear":2016,"dealDate":"2026-09-30","price":54700},{"id":8,"region":"대구","district":"수성구","apartment":"수성 더테라스","address":"수성구 샘플길 33","area":84.95,"floor":9,"builtYear":2017,"dealDate":"2026-09-28","price":38200},{"id":9,"region":"서울","district":"마포구","apartment":"한강 포레스트","address":"마포구 샘플로 12","area":114.72,"floor":1,"builtYear":2018,"dealDate":"2026-09-26","price":125500},{"id":10,"region":"서울","district":"성동구","apartment":"서울숲 리버뷰","address":"성동구 샘플길 24","area":59.98,"floor":8,"builtYear":2019,"dealDate":"2026-09-24","price":98900},{"id":11,"region":"서울","district":"강동구","apartment":"고덕 그린파크","address":"강동구 샘플로 35","area":84.95,"floor":13,"builtYear":2020,"dealDate":"2026-09-22","price":93800},{"id":12,"region":"경기","district":"수원시","apartment":"광교 레이크힐","address":"수원시 샘플길 42","area":114.72,"floor":23,"builtYear":2021,"dealDate":"2026-09-20","price":88300}],"total":240,"page":0,"pages":20}
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+
+MockHttpServletRequest:
+      HTTP Method = GET
+      Request URI = /api/trades
+       Parameters = {}
+          Headers = [X-Forwarded-For:"192.0.2.99"]
+             Body = null
+    Session Attrs = {}
+
+Handler:
+             Type = kr.aptfolio.WebController
+           Method = kr.aptfolio.WebController#api(Map)
+
+Async:
+    Async started = false
+     Async result = null
+
+Resolved Exception:
+             Type = null
+
+ModelAndView:
+        View name = null
+             View = null
+            Model = null
+
+FlashMap:
+       Attributes = null
+
+MockHttpServletResponse:
+           Status = 200
+    Error message = null
+          Headers = [Content-Type:"application/json"]
+     Content type = application/json
+             Body = {"items":[{"id":1,"region":"서울","district":"마포구","apartment":"한강 포레스트","address":"마포구 샘플로 12","area":59.98,"floor":23,"builtYear":2010,"dealDate":"2026-10-12","price":124800},{"id":2,"region":"서울","district":"성동구","apartment":"서울숲 리버뷰","address":"성동구 샘플길 24","area":84.95,"floor":21,"builtYear":2011,"dealDate":"2026-10-10","price":106400},{"id":3,"region":"서울","district":"강동구","apartment":"고덕 그린파크","address":"강동구 샘플로 35","area":114.72,"floor":27,"builtYear":2012,"dealDate":"2026-10-08","price":100000},{"id":4,"region":"경기","district":"수원시","apartment":"광교 레이크힐","address":"수원시 샘플길 42","area":59.98,"floor":2,"builtYear":2013,"dealDate":"2026-10-06","price":88800},{"id":5,"region":"경기","district":"성남시","apartment":"판교 센트럴","address":"성남시 샘플로 8","area":84.95,"floor":28,"builtYear":2014,"dealDate":"2026-10-04","price":75800},{"id":6,"region":"부산","district":"해운대구","apartment":"해운대 오션시티","address":"해운대구 샘플길 17","area":114.72,"floor":11,"builtYear":2015,"dealDate":"2026-10-02","price":66200},{"id":7,"region":"대전","district":"유성구","apartment":"유성 온빛마을","address":"유성구 샘플로 21","area":59.98,"floor":1,"builtYear":2016,"dealDate":"2026-09-30","price":54700},{"id":8,"region":"대구","district":"수성구","apartment":"수성 더테라스","address":"수성구 샘플길 33","area":84.95,"floor":9,"builtYear":2017,"dealDate":"2026-09-28","price":38200},{"id":9,"region":"서울","district":"마포구","apartment":"한강 포레스트","address":"마포구 샘플로 12","area":114.72,"floor":1,"builtYear":2018,"dealDate":"2026-09-26","price":125500},{"id":10,"region":"서울","district":"성동구","apartment":"서울숲 리버뷰","address":"성동구 샘플길 24","area":59.98,"floor":8,"builtYear":2019,"dealDate":"2026-09-24","price":98900},{"id":11,"region":"서울","district":"강동구","apartment":"고덕 그린파크","address":"강동구 샘플로 35","area":84.95,"floor":13,"builtYear":2020,"dealDate":"2026-09-22","price":93800},{"id":12,"region":"경기","district":"수원시","apartment":"광교 레이크힐","address":"수원시 샘플길 42","area":114.72,"floor":23,"builtYear":2021,"dealDate":"2026-09-20","price":88300}],"total":240,"page":0,"pages":20}
+    Forwarded URL = null
+   Redirected URL = null
+          Cookies = []
+[ERROR] Tests run: 3, Failures: 3, Errors: 0, Skipped: 0, Time elapsed: 2.624 s <<< FAILURE! -- in kr.aptfolio.SecurityTest
+[ERROR] kr.aptfolio.SecurityTest.securityHeaders -- Time elapsed: 0.487 s <<< FAILURE!
+java.lang.AssertionError: Response header 'X-Content-Type-Options' expected:<nosniff> but was:<null>
+	at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:61)
+	at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:128)
+	at org.springframework.test.web.servlet.result.HeaderResultMatchers.lambda$string$2(HeaderResultMatchers.java:79)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at kr.aptfolio.SecurityTest.securityHeaders(SecurityTest.java:16)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+
+[ERROR] kr.aptfolio.SecurityTest.limitsCannotBeBypassedWithForwardedHeader -- Time elapsed: 0.027 s <<< FAILURE!
+java.lang.AssertionError: Status expected:<429> but was:<200>
+	at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:61)
+	at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:128)
+	at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$9(StatusResultMatchers.java:640)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at kr.aptfolio.SecurityTest.limitsCannotBeBypassedWithForwardedHeader(SecurityTest.java:22)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+
+[ERROR] kr.aptfolio.SecurityTest.demoIsLoopbackOnly -- Time elapsed: 0.048 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: 
+
+expected: "127.0.0.1"
+ but was: null
+	at kr.aptfolio.SecurityTest.demoIsLoopbackOnly(SecurityTest.java:14)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1597)
+
+[ERROR] Failures: 
+[ERROR]   SecurityTest.demoIsLoopbackOnly:14 
+expected: "127.0.0.1"
+ but was: null
+[ERROR]   SecurityTest.limitsCannotBeBypassedWithForwardedHeader:22 Status expected:<429> but was:<200>
+[ERROR]   SecurityTest.securityHeaders:16 Response header 'X-Content-Type-Options' expected:<nosniff> but was:<null>
+[ERROR] Tests run: 3, Failures: 3, Errors: 0, Skipped: 0
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.4:test (default-test) on project apartment-search: There are test failures.
+[ERROR] 
+[ERROR] See /Users/sangminkim/Documents/Codex/2026-10-09/new-chat/outputs/apartment-search/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

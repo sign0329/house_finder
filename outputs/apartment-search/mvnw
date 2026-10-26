@@ -1,0 +1,23 @@
+#!/usr/bin/env sh
+set -eu
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+# Prefer the project-managed patched runtime over an outdated shell default.
+if [ -x "$ROOT/.tools/java-home/bin/java" ]; then
+ export JAVA_HOME="$ROOT/.tools/java-home"
+ export PATH="$JAVA_HOME/bin:$PATH"
+fi
+if command -v mvn >/dev/null 2>&1; then exec mvn "$@"; fi
+VERSION=3.9.9
+DEST="$ROOT/.tools/apache-maven-$VERSION"
+if [ ! -x "$DEST/bin/mvn" ]; then
+ mkdir -p "$ROOT/.tools"
+ ARCHIVE="$ROOT/.tools/maven.tar.gz"
+ URL="https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/$VERSION/apache-maven-$VERSION-bin.tar.gz"
+ curl --fail --location --retry 2 "$URL" -o "$ARCHIVE"
+ EXPECTED=$(curl --fail --location "$URL.sha512")
+ if command -v sha512sum >/dev/null 2>&1; then ACTUAL=$(sha512sum "$ARCHIVE" | cut -d ' ' -f 1); else ACTUAL=$(shasum -a 512 "$ARCHIVE" | cut -d ' ' -f 1); fi
+ [ "$EXPECTED" = "$ACTUAL" ] || { echo "Maven checksum mismatch" >&2; exit 1; }
+ tar -xzf "$ARCHIVE" -C "$ROOT/.tools"
+ rm "$ARCHIVE"
+fi
+exec "$DEST/bin/mvn" -Dmaven.repo.local="$ROOT/.m2/repository" "$@"

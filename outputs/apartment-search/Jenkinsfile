@@ -1,0 +1,12 @@
+pipeline {
+  agent any
+  options { timestamps(); disableConcurrentBuilds() }
+  stages {
+    stage('Build and test') { steps { sh './mvnw -B clean verify' } }
+    stage('Docker image') { steps { sh 'docker build --pull -t apartment-search:${BUILD_NUMBER} .' } }
+  }
+  post {
+    always { junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml' }
+    success { archiveArtifacts artifacts: 'target/*.jar', fingerprint: true }
+  }
+}

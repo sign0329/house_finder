@@ -1,0 +1,26 @@
+spring:
+  jdbc:
+    template:
+      query-timeout: 5s
+  application:
+    name: apartment-search
+  profiles:
+    default: demo
+  thymeleaf:
+    cache: false
+server:
+  forward-headers-strategy: none
+  max-http-request-header-size: 8KB
+  port: ${PORT:8080}
+  error:
+    include-message: never
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+app:
+  demo: false
+  security:
+    requests-per-minute: ${REQUESTS_PER_MINUTE:120}
+    global-requests-per-minute: ${GLOBAL_REQUESTS_PER_MINUTE:6000}

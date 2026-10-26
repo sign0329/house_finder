@@ -1,0 +1,114 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------< kr.aptfolio:apartment-search >--------------------
+[INFO] Building 집결 — 아파트 실거래가 0.1.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ apartment-search ---
+[INFO] Copying 3 resources from src/main/resources to target/classes
+[INFO] Copying 10 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.14.1:compile (default-compile) @ apartment-search ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 6 source files with javac [debug parameters release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ apartment-search ---
+[INFO] skip non existing resourceDirectory /Users/sangminkim/Documents/Codex/2026-10-09/new-chat/outputs/apartment-search/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ apartment-search ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 2 source files with javac [debug parameters release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ apartment-search ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running kr.aptfolio.SecurityTest
+11:05:16.739 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [kr.aptfolio.SecurityTest]: SecurityTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+11:05:16.812 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration kr.aptfolio.ApartmentApplication for test class kr.aptfolio.SecurityTest
+11:05:16.861 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [kr.aptfolio.SecurityTest]: SecurityTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+11:05:16.863 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration kr.aptfolio.ApartmentApplication for test class kr.aptfolio.SecurityTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.9)
+
+2026-10-26T11:05:17.082+09:00  INFO 4229 --- [apartment-search] [           main] kr.aptfolio.SecurityTest                 : Starting SecurityTest using Java 21.0.13 with PID 4229 (started by sangminkim in /Users/sangminkim/Documents/Codex/2026-10-09/new-chat/outputs/apartment-search)
+2026-10-26T11:05:17.083+09:00  INFO 4229 --- [apartment-search] [           main] kr.aptfolio.SecurityTest                 : No active profile set, falling back to 1 default profile: "demo"
+2026-10-26T11:05:17.863+09:00  INFO 4229 --- [apartment-search] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-10-26T11:05:17.976+09:00  INFO 4229 --- [apartment-search] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:apartments user=SA
+2026-10-26T11:05:17.977+09:00  INFO 4229 --- [apartment-search] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-10-26T11:05:18.007+09:00  INFO 4229 --- [apartment-search] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:apartments (H2 2.4)
+2026-10-26T11:05:18.012+09:00  WARN 4229 --- [apartment-search] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T11:05:18.028+09:00  INFO 4229 --- [apartment-search] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "public"."flyway_schema_history" does not exist yet
+2026-10-26T11:05:18.029+09:00  INFO 4229 --- [apartment-search] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 1 migration (execution time 00:00.008s)
+2026-10-26T11:05:18.035+09:00  INFO 4229 --- [apartment-search] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "public"."flyway_schema_history" ...
+2026-10-26T11:05:18.057+09:00  INFO 4229 --- [apartment-search] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": << Empty Schema >>
+2026-10-26T11:05:18.062+09:00  INFO 4229 --- [apartment-search] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "1 - create trade"
+2026-10-26T11:05:18.073+09:00  INFO 4229 --- [apartment-search] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 1 migration to schema "public", now at version v1 (execution time 00:00.004s)
+2026-10-26T11:05:18.187+09:00  INFO 4229 --- [apartment-search] [           main] o.s.b.w.a.WelcomePageHandlerMapping      : Adding welcome page template: index
+2026-10-26T11:05:18.485+09:00  INFO 4229 --- [apartment-search] [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-10-26T11:05:18.486+09:00  INFO 4229 --- [apartment-search] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-10-26T11:05:18.490+09:00  INFO 4229 --- [apartment-search] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-10-26T11:05:18.497+09:00  INFO 4229 --- [apartment-search] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 10 ms
+2026-10-26T11:05:18.531+09:00  INFO 4229 --- [apartment-search] [           main] kr.aptfolio.SecurityTest                 : Started SecurityTest in 1.633 seconds (process running for 2.359)
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.613 s -- in kr.aptfolio.SecurityTest
+[INFO] Running kr.aptfolio.WebTest
+2026-10-26T11:05:19.251+09:00  INFO 4229 --- [apartment-search] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [kr.aptfolio.WebTest]: WebTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-26T11:05:19.252+09:00  INFO 4229 --- [apartment-search] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration kr.aptfolio.ApartmentApplication for test class kr.aptfolio.WebTest
+2026-10-26T11:05:19.253+09:00  INFO 4229 --- [apartment-search] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [kr.aptfolio.WebTest]: WebTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-26T11:05:19.254+09:00  INFO 4229 --- [apartment-search] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration kr.aptfolio.ApartmentApplication for test class kr.aptfolio.WebTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.9)
+
+2026-10-26T11:05:19.270+09:00  INFO 4229 --- [apartment-search] [           main] kr.aptfolio.WebTest                      : Starting WebTest using Java 21.0.13 with PID 4229 (started by sangminkim in /Users/sangminkim/Documents/Codex/2026-10-09/new-chat/outputs/apartment-search)
+2026-10-26T11:05:19.270+09:00  INFO 4229 --- [apartment-search] [           main] kr.aptfolio.WebTest                      : No active profile set, falling back to 1 default profile: "demo"
+2026-10-26T11:05:19.417+09:00  INFO 4229 --- [apartment-search] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2026-10-26T11:05:19.418+09:00  INFO 4229 --- [apartment-search] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection conn10: url=jdbc:h2:mem:apartments user=SA
+2026-10-26T11:05:19.418+09:00  INFO 4229 --- [apartment-search] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2026-10-26T11:05:19.419+09:00  INFO 4229 --- [apartment-search] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:apartments (H2 2.4)
+2026-10-26T11:05:19.420+09:00  WARN 4229 --- [apartment-search] [           main] o.f.c.internal.database.base.Database    : Using H2 2.4.240 which is newer than the version Flyway has been verified with. The latest verified version of H2 is 2.3.232.
+2026-10-26T11:05:19.423+09:00  INFO 4229 --- [apartment-search] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 1 migration (execution time 00:00.001s)
+2026-10-26T11:05:19.424+09:00  INFO 4229 --- [apartment-search] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": 1
+2026-10-26T11:05:19.425+09:00  INFO 4229 --- [apartment-search] [           main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+2026-10-26T11:05:19.452+09:00  INFO 4229 --- [apartment-search] [           main] o.s.b.w.a.WelcomePageHandlerMapping      : Adding welcome page template: index
+2026-10-26T11:05:19.516+09:00  INFO 4229 --- [apartment-search] [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-10-26T11:05:19.516+09:00  INFO 4229 --- [apartment-search] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-10-26T11:05:19.518+09:00  INFO 4229 --- [apartment-search] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-10-26T11:05:19.520+09:00  INFO 4229 --- [apartment-search] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 3 ms
+2026-10-26T11:05:19.528+09:00  INFO 4229 --- [apartment-search] [           main] kr.aptfolio.WebTest                      : Started WebTest in 0.271 seconds (process running for 3.356)
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.409 s -- in kr.aptfolio.WebTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ apartment-search ---
+[INFO] Building jar: /Users/sangminkim/Documents/Codex/2026-10-09/new-chat/outputs/apartment-search/target/apartment-search-0.1.0.jar
+[INFO] 
+[INFO] --- spring-boot:4.0.9:repackage (repackage) @ apartment-search ---
+[INFO] Replacing main artifact /Users/sangminkim/Documents/Codex/2026-10-09/new-chat/outputs/apartment-search/target/apartment-search-0.1.0.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to /Users/sangminkim/Documents/Codex/2026-10-09/new-chat/outputs/apartment-search/target/apartment-search-0.1.0.jar.original
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  17.189 s
+[INFO] Finished at: 2026-10-26T11:05:20+09:00
+[INFO] ------------------------------------------------------------------------
