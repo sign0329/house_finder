@@ -27,8 +27,8 @@
 | 화면 | Thymeleaf, CSS, JavaScript | 구현 |
 | 데이터 접근 | Spring JDBC, Flyway | 구현 |
 | 기본 실행 DB | H2 | 테스트·실행 확인 |
-| 운영 후보 DB | PostgreSQL 17 | 프로필·Compose 준비, 실행 미검증 |
-| 테스트 | JUnit 5, MockMvc | 30개 통과 |
+| 개발 DB | PostgreSQL 17 | 실제 거래 32건 저장·조회, 통합 테스트 7개 통과 |
+| 테스트 | JUnit 5, MockMvc, Testcontainers | 기본 30개 + PostgreSQL 7개 통과 |
 | 컨테이너·CI | Docker, Compose, Jenkinsfile | 설정 준비, 실행 미검증 |
 | 성능 실험 | k6 | 스크립트 준비, 측정 미실시 |
 | 캐시 | Redis | 선택적 Compose 서비스만 준비 |
@@ -111,3 +111,7 @@ SQL과 실행 계획을 직접 관찰할 수 있도록 JDBC를 사용합니다. 
 - [작업 규칙](AGENTS.md)
 
 AI 코딩 도구를 활용해 구현하고 테스트·실행 결과로 변경을 검증했습니다. 초기 구현 전체를 TDD로 주장하지 않으며, 보안 보완에서는 신규 테스트 3개의 실패를 확인한 뒤 수정한 기록이 있습니다.
+
+## PostgreSQL 개발 환경
+
+[PostgreSQL 실행 및 테스트 안내](docs/postgresql.md). Docker의 전용 DB를 5433 포트에 실행하고 IntelliJ 앱을 8081 포트로 연결할 수 있습니다. 기본 H2 실행과 별도이며, `sh scripts/test-postgres.sh`로 실제 PostgreSQL 통합 테스트를 실행합니다.
