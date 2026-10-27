@@ -52,7 +52,7 @@ jobs:
           docker compose restart app
           docker compose up -d --wait app
       - name: Stop disposable CI stack
-         if: always()
-         env:
+        if: always()
+        env:
           DB_PASSWORD: disposable-ci-database
-         run: docker compose down --volumes
+        run: docker compose down --volumes
