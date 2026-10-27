@@ -49,7 +49,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in the local env file}
       DEMO_DATA: 'false'
       MOLIT_SERVICE_KEY: ${MOLIT_SERVICE_KEY:-}
-    command: ["--molit.import-on-start=true", "--molit.month=${MOLIT_MONTH:-202609}"]
+    command: ["--molit.import-on-start=true", "--molit.month=${MOLIT_MONTH:-202609}", "--molit.regions=${MOLIT_REGIONS:-11110:서울:종로구}", "--molit.from=${MOLIT_FROM:-}", "--molit.to=${MOLIT_TO:-}"]
     depends_on:
       db:
         condition: service_healthy

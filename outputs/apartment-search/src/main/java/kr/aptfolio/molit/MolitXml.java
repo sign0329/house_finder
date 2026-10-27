@@ -17,6 +17,9 @@ public class MolitXml {
  public record Item(String apartment,String address,BigDecimal area,int floor,int builtYear,LocalDate date,long price,boolean cancelled) {}
  public record Page(int total,int number,int size,List<Item> items) {}
  public Page parse(String xml, YearMonth month) {
+  return parse(xml, MolitRegion.JONGNO, month);
+ }
+ public Page parse(String xml, MolitRegion region, YearMonth month) {
   try {
    if(xml.length()>2_000_000)throw new IllegalArgumentException();
    var factory=DocumentBuilderFactory.newInstance();
@@ -36,11 +39,11 @@ public class MolitXml {
    List<Item> items=new ArrayList<>();var nodes=root.getElementsByTagName("item");
    for(int i=0;i<nodes.getLength();i++) {
     var e=(Element)nodes.item(i);
-    if(!text(e,"sggCd").equals("11110"))throw new IllegalArgumentException();
+    if(!text(e,"sggCd").equals(region.code()))throw new IllegalArgumentException();
     LocalDate date=LocalDate.of(Integer.parseInt(text(e,"dealYear")),Integer.parseInt(text(e,"dealMonth")),Integer.parseInt(text(e,"dealDay")));
     if(!YearMonth.from(date).equals(month))throw new IllegalArgumentException();
     String apartment=required(e,"aptNm");
-    String address="서울 종로구 "+required(e,"umdNm")+" "+text(e,"jibun");
+    String address=region.addressPrefix()+required(e,"umdNm")+" "+text(e,"jibun");
     BigDecimal area=new BigDecimal(required(e,"excluUseAr")).setScale(4,java.math.RoundingMode.UNNECESSARY);
     long price=Long.parseLong(required(e,"dealAmount").replace(",",""));
     int floor=Integer.parseInt(required(e,"floor"));

@@ -10,6 +10,7 @@ public class SearchService {
  private final NamedParameterJdbcTemplate db;
  private static final RowMapper<Trade> ROW=(r,n)->new Trade(r.getLong("id"),r.getString("region"),r.getString("district"),r.getString("apartment"),r.getString("address"),r.getBigDecimal("area"),r.getInt("floor"),r.getInt("built_year"),r.getDate("deal_date").toLocalDate(),r.getLong("price"));
  public SearchService(NamedParameterJdbcTemplate db) {this.db=db;}
+ public List<String> regions() { return db.queryForList("select distinct region from trade order by region",Map.of(),String.class); }
  public record Results(List<Trade> items,long total,int page,int pages) {}
  public Results search(Map<String,String> input) {
   Map<String,Object> args=new HashMap<>(); StringBuilder where=new StringBuilder(" where 1=1");

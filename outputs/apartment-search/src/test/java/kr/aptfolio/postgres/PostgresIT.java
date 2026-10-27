@@ -54,11 +54,33 @@ class PostgresIT {
   return new MolitXml.Item(name,"서울 종로구 테스트동 1",new BigDecimal("84.9512"),7,2010,date,price,cancelled);
  }
  private static MolitXml.Item item(String name) {return item(name,82500,LocalDate.of(2026,9,15),false);}
+ @Test void upgradesExistingJongnoRowsWithoutChangingIdentity() {
+  var config=org.flywaydb.core.Flyway.configure().dataSource(postgres.getJdbcUrl(),postgres.getUsername(),postgres.getPassword()).schemas("upgrade_test").defaultSchema("upgrade_test");
+  config.target("3").load().migrate();
+  db.update("insert into upgrade_test.trade(region,district,apartment,address,area,floor,built_year,deal_date,price,source,source_key,source_month,snapshot_id) values('서울','종로구','기존 거래','서울 종로구 테스트동',84,7,2010,'2026-09-15',82500,'MOLIT','legacy-key','202609','legacy-snapshot')");
+  long id=db.queryForObject("select id from upgrade_test.trade",Long.class);
+  org.flywaydb.core.Flyway.configure().dataSource(postgres.getJdbcUrl(),postgres.getUsername(),postgres.getPassword()).schemas("upgrade_test").defaultSchema("upgrade_test").load().migrate();
+  assertEquals("11110",db.queryForObject("select source_region from upgrade_test.trade",String.class));
+  assertEquals(id,db.queryForObject("select id from upgrade_test.trade",Long.class));
+  assertEquals("legacy-key",db.queryForObject("select source_key from upgrade_test.trade",String.class));
+ }
+ @Test void regionSnapshotsAreIsolatedOnPostgres() {
+  var region=new kr.aptfolio.molit.MolitRegion("11680","서울","강남구");
+  var jongno=new MolitXml.Item("동일 이름","서울 종로구 테스트동 1",new BigDecimal("84.95"),7,2010,LocalDate.of(2026,9,15),82500,false);
+  var gangnam=new MolitXml.Item("동일 이름","서울 강남구 테스트동 1",new BigDecimal("84.95"),7,2010,LocalDate.of(2026,9,15),82500,false);
+  store.replace(MONTH,List.of(jongno));store.replace(region,MONTH,List.of(gangnam));
+  var ids=db.queryForList("select id from trade order by id",Long.class);
+  store.replace(region,MONTH,List.of(gangnam));
+  assertEquals(ids,db.queryForList("select id from trade order by id",Long.class));
+  store.replace(MONTH,List.of());
+  assertEquals(1,db.queryForObject("select count(*) from trade where source_region='11680'",Integer.class));
+  assertEquals(1,search.search(Map.of("q","강남구","from","2026-09-01","to","2026-09-30")).total());
+ }
  @Test void appliesAllMigrationsOnPostgres17() {
   assertTrue(db.queryForObject("select version()",String.class).startsWith("PostgreSQL 17."));
-  assertEquals(3,db.queryForObject("select count(*) from flyway_schema_history where success=true and type='SQL'",Integer.class));
+  assertEquals(4,db.queryForObject("select count(*) from flyway_schema_history where success=true and type='SQL'",Integer.class));
   assertEquals(4,db.queryForObject("select numeric_scale from information_schema.columns where table_schema='public' and table_name='trade' and column_name='area'",Integer.class));
-  assertEquals(1,db.queryForObject("select count(*) from pg_indexes where indexname='idx_trade_source_key'",Integer.class));
+  assertEquals(1,db.queryForObject("select count(*) from pg_indexes where schemaname='public' and indexname='idx_trade_source_key'",Integer.class));
  }
  @Test void storesParsedTradesAndServesSearchAndDetail() throws Exception {
   String xml="""
