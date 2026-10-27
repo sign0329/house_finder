@@ -21,3 +21,7 @@ work/
 data/
 *.mv.db
 *.trace.db
+
+# Database backups must never enter Git or images
+backups/
+*.dump
