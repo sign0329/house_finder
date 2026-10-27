@@ -1,0 +1,89 @@
+name: house-finder-production
+services:
+  app:
+    image: ${APP_IMAGE:-house-finder-app:production}
+    build: .
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres
+      DB_URL: jdbc:postgresql://db:5432/apartments
+      DB_USER: ${DB_USER:-apartments}
+      DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in the local env file}
+      DB_POOL_SIZE: ${DB_POOL_SIZE:-10}
+      DEMO_DATA: 'false'
+      SERVER_FORWARD_HEADERS_STRATEGY: native
+      MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: 'true'
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8080/actuator/health/readiness"]
+      interval: 10s
+      timeout: 3s
+      start_period: 30s
+      retries: 6
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: unless-stopped
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: apartments
+      POSTGRES_USER: ${DB_USER:-apartments}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in the local env file}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d apartments"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: unless-stopped
+  importer:
+    image: ${APP_IMAGE:-house-finder-app:production}
+    build: .
+    profiles: [tools]
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres
+      SPRING_MAIN_WEB_APPLICATION_TYPE: none
+      DB_URL: jdbc:postgresql://db:5432/apartments
+      DB_USER: ${DB_USER:-apartments}
+      DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in the local env file}
+      DEMO_DATA: 'false'
+      MOLIT_SERVICE_KEY: ${MOLIT_SERVICE_KEY:-}
+    command: ["--molit.import-on-start=true", "--molit.month=${MOLIT_MONTH:-202609}", "--molit.regions=${MOLIT_REGIONS:-11110:서울:종로구}", "--molit.from=${MOLIT_FROM:-}", "--molit.to=${MOLIT_TO:-}"]
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: 'no'
+  proxy:
+    image: caddy:2-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:?Set DOMAIN to your public DNS name}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: unless-stopped
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:
