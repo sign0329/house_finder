@@ -18,7 +18,7 @@ public class SearchService {
   if(q.length()>100) throw new IllegalArgumentException("검색어는 100자 이내로 입력해주세요.");
   if(!q.isEmpty()) {where.append(" and (apartment like :q escape '!' or district like :q escape '!')");args.put("q","%"+q.replace("!","!!").replace("%","!%").replace("_","!_")+"%");}
   String region=input.getOrDefault("region","");
-  if(!region.isEmpty()) {where.append(" and region=:region");args.put("region",region);}
+  if(!region.isEmpty()) {where.append(" and region in (:region)");args.put("region",Provinces.aliases(region));}
   Long min=number(input,"minPrice"), max=number(input,"maxPrice");
   if(min!=null && max!=null && min>max) throw new IllegalArgumentException("최소 가격이 최대 가격보다 큽니다.");
   if(min!=null){where.append(" and price>=:min");args.put("min",min);}
