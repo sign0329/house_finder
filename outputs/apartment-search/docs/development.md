@@ -1,19 +1,8 @@
 # 개발 및 실행 안내
 
-## Docker + PostgreSQL (설정 준비, 실행 미검증)
+## Docker + PostgreSQL
 
-Docker Engine/Desktop과 Compose가 필요하다. 프로젝트 루트에서:
-
-```sh
-cp .env.example .env
-# .env의 DB_PASSWORD를 변경한 뒤 실행
-# 다른 서버가 8080을 사용 중이면 종료하거나 .env의 PORT 변경
-docker compose build --pull
-docker compose up -d
-docker compose logs -f app
-```
-
-종료는 `docker compose down`. DB 볼륨은 유지된다. 앱 포트는 호스트 127.0.0.1에 노출되고 DB·Redis 포트는 호스트에 공개하지 않는다. Redis는 `--profile cache`로 켤 수 있으나 앱 캐싱은 미구현이다.
+앱까지 컨테이너로 실행하는 방법은 [전체 Docker 안내](docker.md)를 따른다. 기본 접속 포트는 8082이며 `.env.docker`의 PORT로 변경한다. 개발용 기존 H2/Java 앱은 자동 종료하지 않는다.
 
 ## 환경 변수
 

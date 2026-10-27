@@ -1,25 +1,34 @@
+name: house-finder-stack
 services:
   app:
+    image: house-finder-app:local
     build: .
     ports:
-      - "127.0.0.1:${PORT:-8080}:8080"
+      - "127.0.0.1:${PORT:-8082}:8080"
     environment:
       SPRING_PROFILES_ACTIVE: postgres
       DB_URL: jdbc:postgresql://db:5432/apartments
       DB_USER: ${DB_USER:-apartments}
-      DB_PASSWORD: ${DB_PASSWORD:?Copy .env.example to .env and set DB_PASSWORD}
+      DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in the local env file}
       DB_POOL_SIZE: ${DB_POOL_SIZE:-10}
       DEMO_DATA: ${DEMO_DATA:-false}
+      MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: 'true'
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8080/actuator/health/readiness"]
+      interval: 10s
+      timeout: 3s
+      start_period: 30s
+      retries: 6
     restart: unless-stopped
   db:
     image: postgres:17-alpine
     environment:
       POSTGRES_DB: apartments
       POSTGRES_USER: ${DB_USER:-apartments}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in the local env file}
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -28,10 +37,27 @@ services:
       timeout: 3s
       retries: 15
     restart: unless-stopped
+  importer:
+    image: house-finder-app:local
+    build: .
+    profiles: [tools]
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres
+      SPRING_MAIN_WEB_APPLICATION_TYPE: none
+      DB_URL: jdbc:postgresql://db:5432/apartments
+      DB_USER: ${DB_USER:-apartments}
+      DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in the local env file}
+      DEMO_DATA: 'false'
+      MOLIT_SERVICE_KEY: ${MOLIT_SERVICE_KEY:-}
+    command: ["--molit.import-on-start=true", "--molit.month=${MOLIT_MONTH:-202609}"]
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: 'no'
   redis:
     image: redis:7.4-alpine
     profiles: [cache]
     command: ["redis-server", "--maxmemory", "128mb", "--maxmemory-policy", "allkeys-lru"]
-    # Optional infrastructure only; application caching is a future task.
+    # Infrastructure only; application caching is not implemented.
 volumes:
   pgdata:
