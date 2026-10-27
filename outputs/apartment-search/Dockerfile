@@ -5,16 +5,17 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* /opt/java/openjdk
 
 # Official Java 21.0.13 archives; hashes are reviewed with each patch update.
-FROM os-base AS java-download
+FROM --platform=$BUILDPLATFORM eclipse-temurin:21-jre AS java-download
 ARG TARGETARCH
+ARG BUILDARCH
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 COPY docker/install-java.sh docker/java21-checksums.txt /tmp/
-RUN sh /tmp/install-java.sh "$TARGETARCH" jdk /opt/jdk \
+RUN sh /tmp/install-java.sh "$BUILDARCH" jdk /opt/jdk \
     && sh /tmp/install-java.sh "$TARGETARCH" jre /opt/jre
 
-FROM maven:3.9.9-eclipse-temurin-21 AS maven-tool
-FROM os-base AS build
+FROM --platform=$BUILDPLATFORM maven:3.9.9-eclipse-temurin-21 AS build
+RUN rm -rf /opt/java/openjdk
 COPY --from=java-download /opt/jdk /opt/java/openjdk
-COPY --from=maven-tool /usr/share/maven /usr/share/maven
 ENV MAVEN_HOME=/usr/share/maven
 ENV PATH="/usr/share/maven/bin:${PATH}"
 WORKDIR /workspace

@@ -69,3 +69,16 @@ docker compose --env-file .env.production -f compose.production.yaml up -d --wai
 3. 백업 스크립트 실행, 파일 권한 600, 별도 임시 PostgreSQL DB에 복원 후 검증용 행 값 일치. 테스트 컨테이너·볼륨만 정리했다.
 
 Java 코드는 변경하지 않았다. 기존 필수 GitHub CI는 그대로 유지한다. 서버 구매/설정, 공인 DNS·TLS, 정기 백업 예약, 외부 백업 복사, 실제 공개는 아직 수행하지 않았다.
+
+## Mac에서 AMD64 서버용 이미지 만들기
+
+```sh
+docker buildx build --platform linux/amd64 -t house-finder-app:production --load .
+# SSH로 전송해 서버에서 docker load 후, 서버에서는 빌드 없이 실행
+# 도메인 준비 전에는 app만 실행하고 proxy는 시작하지 않는다.
+docker compose --env-file .env.production -f compose.production.yaml up -d --no-build --wait app
+```
+
+빌드 JDK는 BUILDARCH, 최종 실행 JRE는 TARGETARCH를 사용한다. ARM Mac에서 AMD64 Java 압축 해제를 에뮬레이션으로 실행할 때 발생한 `Function not implemented` 오류를 피하도록 다운로드·컴파일 단계는 BUILDPLATFORM에서 실행한다.
+
+2026-10-28 검증: (1) ARM Mac → AMD64 이미지 빌드와 기본 테스트 43개 성공, (2) Ubuntu AWS 서버에서 앱·DB healthy 및 내부 검색 726건 응답, (3) 서버 DB 복원 건수 보존과 첫 백업 생성. 앱·DB 호스트 공개 포트는 없고 도메인 미준비로 프록시는 아직 실행하지 않았다. 실제 API 키는 서버로 전송하지 않았다. 서버 주소와 비밀값은 문서에 기록하지 않는다.
