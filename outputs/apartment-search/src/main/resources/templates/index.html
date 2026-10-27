@@ -1,10 +1,10 @@
 <!DOCTYPE html><html lang="ko" xmlns:th="http://www.thymeleaf.org"><head th:replace="~{fragments :: head('실거래가 탐색')}"></head><body>
 <div th:replace="~{fragments :: header('search')}"></div><main class="shell">
 <section class="hero"><div><div class="eyebrow"><span></span> APARTMENT INSIGHT</div><h1>내가 찾는 집,<br><em>거래의 흐름</em>부터.</h1><p>지역과 가격으로 좁혀보고, 실제 거래 기록으로 비교하세요.</p></div><div class="hero-art" aria-hidden="true"><div class="orbit"></div><div class="building b1"></div><div class="building b2"></div><div class="building b3"></div><span class="art-label">A BETTER PLACE TO CALL HOME</span></div></section>
-<div th:unless="${demo}" class="notice" th:text="${dataNotice}"></div>
+<div th:unless="${demo}" class="notice" th:text="${dataNotice}"></div><p th:unless="${demo}" class="notice">전국 17개 시도를 선택할 수 있어요. 조회 결과는 수집된 거래 기준이며, 아직 수집되지 않은 지역·기간은 결과가 없을 수 있어요.</p>
 <div th:if="${demo}" class="notice"><span class="notice-dot"></span><b>데모 둘러보기</b><span>가상 거래 데이터 240건으로 검색과 상세 화면을 체험할 수 있어요. 실제 시세가 아닙니다.</span></div>
 <form method="get" action="/" class="search-panel"><div class="search-top"><label class="search-input"><span aria-hidden="true">⌕</span><input name="q" th:value="${filters.get('q')}" placeholder="아파트명 또는 시·군·구를 검색하세요" aria-label="아파트명 또는 지역명"></label><button class="primary" type="submit">실거래가 검색 <span>↗</span></button></div>
-<div class="filters"><label>지역<select name="region"><option value="">전체 지역</option><option th:each="r:${regions}" th:value="${r}" th:text="${r}" th:selected="${r==filters.get('region')}"></option></select></label>
+<div class="filters"><label>지역<select name="region"><option value="">전국 · 전체 지역</option><option th:each="r:${regions}" th:value="${r}" th:text="${r}" th:selected="${r==selectedRegion}"></option></select></label>
 <label>전용면적<select name="area"><option value="">전체 면적</option><option value="small" th:selected="${filters.get('area')=='small'}">60㎡ 미만</option><option value="medium" th:selected="${filters.get('area')=='medium'}">60–85㎡</option><option value="large" th:selected="${filters.get('area')=='large'}">85㎡ 초과</option></select></label>
 <label>최소 가격 · 만원<input type="number" min="0" name="minPrice" placeholder="제한 없음" th:value="${filters.get('minPrice')}"></label><label>최대 가격 · 만원<input type="number" min="0" name="maxPrice" placeholder="제한 없음" th:value="${filters.get('maxPrice')}"></label>
 <label>계약 시작일<input type="date" name="from" th:value="${filters.get('from')}"></label><label>계약 종료일<input type="date" name="to" th:value="${filters.get('to')}"></label></div>
