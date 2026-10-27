@@ -25,6 +25,54 @@ class MolitTest {
  <cdealType>%s</cdealType></item>
  """.formatted(cancelled);}
  static String page(int total,int number,int size,String items) {return "<response><header><resultCode>000</resultCode></header><body><items>"+items+"</items><totalCount>"+total+"</totalCount><pageNo>"+number+"</pageNo><numOfRows>"+size+"</numOfRows></body></response>";}
+ @Test void importedProvinceAppearsInSearchOptions() throws Exception {
+  var region=new MolitRegion("50110","제주","제주시");
+  store.replace(region,MONTH,new MolitXml().parse(page(1,1,100,item("").replace("11110","50110")),region,MONTH).items());
+  mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/"))
+   .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.model().attribute("regions",org.hamcrest.Matchers.hasItem("제주")));
+ }
+ @Test void collectsTwoRegionsAndTwoMonthsAndReportsPartialFailure() throws Exception {
+  var plan=MolitPlan.parse("11110:서울:종로구,11680:서울:강남구","202609","202608","202609");
+  var reports=new java.util.ArrayList<MolitCollector.Result>();
+  var client=new MolitClient("test",uri->{
+   boolean gangnam=uri.getQuery().contains("LAWD_CD=11680");
+   boolean august=uri.getQuery().contains("DEAL_YMD=202608");
+   if(gangnam&&august)return new MolitClient.Reply(403,"secret upstream response");
+   String xml=item("").replace("11110",gangnam?"11680":"11110").replace("<dealMonth>9",august?"<dealMonth>8":"<dealMonth>9");
+   return new MolitClient.Reply(200,page(1,1,100,xml));
+  });
+  var results=new MolitCollector(client,store).collect(plan,reports::add);
+  assertEquals(results,reports);
+  assertEquals(List.of(true,true,false,true),results.stream().map(MolitCollector.Result::success).toList());
+  assertEquals(3,db.queryForObject("select count(*) from trade",Integer.class));
+  var ids=db.queryForList("select id from trade order by id",Long.class);
+  new MolitCollector(client,store).collect(plan,r->{});
+  assertEquals(ids,db.queryForList("select id from trade order by id",Long.class));
+  mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/api/trades").param("region","서울").param("q","강남구").param("from","2026-09-01").param("to","2026-09-30"))
+   .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath("$.total").value(1));
+ }
+ @Test void regionRefreshAndEmptySnapshotPreserveOtherRegionAndMonth() {
+  var gangnam=new MolitRegion("11680","서울","강남구");
+  var items=new MolitXml().parse(page(1,1,100,item("").replace("11110","11680")),gangnam,MONTH).items();
+  store.replace(gangnam,MONTH,items);
+  store.replace(MONTH,new MolitXml().parse(page(1,1,100,item("")),MONTH).items());
+  store.replace(MONTH,List.of());
+  assertEquals(1,db.queryForObject("select count(*) from trade where source_region='11680'",Integer.class));
+  var fail=new MolitClient("test",uri->new MolitClient.Reply(403,""));
+  var result=new MolitCollector(fail,store).collect(MolitPlan.parse("11680:서울:강남구","202609","",""),r->{});
+  assertFalse(result.getFirst().success());
+  assertEquals(1,db.queryForObject("select count(*) from trade",Integer.class));
+ }
+ @Test void rejectsResponseFromDifferentRequestedRegion() {
+  var gangnam=new MolitRegion("11680","서울","강남구");
+  var client=new MolitClient("test",uri->new MolitClient.Reply(200,page(1,1,100,item(""))));
+  assertThrows(IllegalArgumentException.class,()->client.fetch(gangnam,MONTH));
+ }
+ @Test void refreshingJongnoMustNotDeleteAnotherDistrictInSameMonth() {
+  db.update("insert into trade(region,district,apartment,address,area,floor,built_year,deal_date,price,source,source_key,source_month,snapshot_id) values('서울','강남구','보존 대상','서울 강남구 테스트동',84,7,2010,'2026-09-15',82500,'MOLIT','other-region','202609','previous')");
+  store.replace(MONTH,List.of());
+  assertEquals(1,db.queryForObject("select count(*) from trade where district='강남구'",Integer.class));
+ }
  @Test void collectedTradesAreSearchableWithSourceNotice() throws Exception {
   store.replace(MONTH,new MolitXml().parse(page(1,1,100,item("")),MONTH).items());
   mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/")).andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk())

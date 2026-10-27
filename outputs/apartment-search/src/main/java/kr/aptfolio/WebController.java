@@ -12,7 +12,7 @@ public class WebController {
  private final SearchService service;
  @Value("${app.demo:false}") boolean demo;
  public WebController(SearchService service){this.service=service;}
- @ModelAttribute void shared(Model m){m.addAttribute("demo",demo);if(!demo)m.addAttribute("dataNotice",service.dataNotice());m.addAttribute("regions",List.of("서울","경기","부산","대전","대구"));}
+ @ModelAttribute void shared(Model m){m.addAttribute("demo",demo);if(!demo)m.addAttribute("dataNotice",service.dataNotice());m.addAttribute("regions",demo?List.of("서울","경기","부산","대전","대구"):service.regions());}
  @GetMapping("/") String home(@RequestParam Map<String,String> params,Model m){
   var result=service.search(params);m.addAttribute("result",result);m.addAttribute("filters",params);
   m.addAttribute("previous",pageUrl(params,Math.max(0,result.page()-1)));

@@ -28,7 +28,7 @@
 | 데이터 접근 | Spring JDBC, Flyway | 구현 |
 | 기본 실행 DB | H2 | 테스트·실행 확인 |
 | 개발 DB | PostgreSQL 17 | 실제 거래 32건 저장·조회, 통합 테스트 7개 통과 |
-| 테스트 | JUnit 5, MockMvc, Testcontainers | 기본 30개 + PostgreSQL 7개 통과 |
+| 테스트 | JUnit 5, MockMvc, Testcontainers | 기본 38개 + PostgreSQL 9개 통과 |
 | CI | GitHub Actions | PR·main의 Java 테스트 실행 확인 |
 | 컨테이너 | Docker, Compose | 앱·DB 실행, 실제 수집, 재시작 후 데이터 유지 확인 |
 | 별도 CI | Jenkinsfile | 설정 준비, 실행 미검증 |
@@ -131,3 +131,7 @@ http://localhost:8082 접속. 키는 일회성 수집 컨테이너에만 전달�
 ## PostgreSQL 개발 환경
 
 [PostgreSQL 실행 및 테스트 안내](docs/postgresql.md). Docker의 전용 DB를 5433 포트에 실행하고 IntelliJ 앱을 8081 포트로 연결할 수 있습니다. 기본 H2 실행과 별도이며, `sh scripts/test-postgres.sh`로 실제 PostgreSQL 통합 테스트를 실행합니다.
+
+## 지역·기간 수집 확장
+
+`molit.regions`에 코드:시도:시군구 목록, `molit.from`/`molit.to`에 계약월 범위를 지정할 수 있습니다. 기존 단일 월 실행도 유지합니다. [실행 예시·실패 구간 재실행](docs/public-api.md#여러-지역기간-수집)을 참고하세요.

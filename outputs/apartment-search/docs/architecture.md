@@ -16,7 +16,7 @@ compose 데모를 사용하려면 .env.example의 DEMO_DATA=true를 사용한다
 region/deal_date 및 apartment/deal_date 인덱스를 둔다. 부분 문자열 검색은 인덱스 효과가 제한된다.
 Redis는 선택적 인프라만 제공하며 실제 캐싱은 아직 연결하지 않았다.
 
-종로구 API 수집은 별도 시작 옵션으로 지원한다. 회원 로그인/운영 배포는 미구현이다.
+지역·기간 지정 API 수집은 별도 시작 옵션으로 지원한다. 회원 로그인/운영 배포는 미구현이다.
 AWS 배포 후보: EC2 + Docker, 필요에 따라 RDS 분리. 리소스는 생성하지 않았다.
 
 ## 거래 모델
@@ -40,8 +40,10 @@ AWS 배포 후보: EC2 + Docker, 필요에 따라 RDS 분리. 리소스는 생�
 
 ## 공공데이터 수집 경로
 
-MolitImportRunner → MolitClient(HTTPS/페이지 검증) → MolitXml → MolitStore(트랜잭션). molit 프로필은 별도 파일 H2를 사용한다. 조회는 기존 SearchService를 재사용한다. V2는 수집 식별자·월·스냅샷·성공 시각, V3는 면적 소수 정밀도를 추가한다. [수집 정책과 한계](public-api.md)를 참고한다.
+MolitImportRunner → MolitPlan(범위 검증) → MolitCollector(구간 순차 실행) → MolitClient(HTTPS/페이지 검증) → MolitXml → MolitStore(트랜잭션). molit 프로필은 별도 파일 H2를 사용한다. 조회는 기존 SearchService를 재사용한다. V2는 수집 식별자·월·스냅샷·성공 시각, V3는 면적 소수 정밀도를 추가한다. [수집 정책과 한계](public-api.md)를 참고한다.
 
 ## PostgreSQL 검증 환경
 
 `compose.postgres.yaml`은 IntelliJ 앱을 위한 전용 PostgreSQL 개발 DB다. Testcontainers 통합 테스트는 개발 DB를 사용하지 않고 새 PostgreSQL 17 컨테이너를 임의 포트로 만들고 정리한다. Maven `postgres-it` 프로필에서 Failsafe를 실행하며 Docker가 없으면 실패한다. CI의 필수 Java tests에 이 프로필을 포함한다.
+
+V4는 source_region을 추가하고 기존 종로구 행을 보정한다. 스냅샷 삭제는 지역 코드와 계약월로 제한한다. 구간별 트랜잭션이라 일부 실패해도 성공한 구간은 유지된다. 상세 실행 정책은 public-api.md를 따른다.

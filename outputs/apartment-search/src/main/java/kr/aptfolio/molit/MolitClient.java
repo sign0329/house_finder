@@ -28,15 +28,16 @@ public class MolitClient {
    return new Reply(response.statusCode(),response.body());
   });
  }
- public List<MolitXml.Item> fetch(YearMonth month) {
+ public List<MolitXml.Item> fetch(YearMonth month) { return fetch(MolitRegion.JONGNO, month); }
+ public List<MolitXml.Item> fetch(MolitRegion region, YearMonth month) {
   if(key==null||key.isBlank())throw new IllegalArgumentException("MOLIT_SERVICE_KEY 환경 변수를 설정하세요.");
   if(month.isAfter(YearMonth.now())||month.isBefore(YearMonth.of(2006,1)))throw new IllegalArgumentException("수집 계약월을 확인하세요.");
   String encodedKey=encodeServiceKey(key);
   List<MolitXml.Item> items=new ArrayList<>();int total=-1;int size=-1;
   for(int page=1;page<=100;page++) {
-   URI uri=URI.create(ENDPOINT+"?serviceKey="+encodedKey+"&LAWD_CD=11110&DEAL_YMD="+month.format(DateTimeFormatter.ofPattern("yyyyMM"))+"&pageNo="+page+"&numOfRows=100");
+   URI uri=URI.create(ENDPOINT+"?serviceKey="+encodedKey+"&LAWD_CD="+region.code()+"&DEAL_YMD="+month.format(DateTimeFormatter.ofPattern("yyyyMM"))+"&pageNo="+page+"&numOfRows=100");
    Reply reply=request(uri);
-   var parsed=new MolitXml().parse(reply.body(),month);
+   var parsed=new MolitXml().parse(reply.body(),region,month);
    if(total<0){total=parsed.total();size=parsed.size();}
    int expected=Math.min(size,total-items.size());
    if(parsed.number()!=page||parsed.total()!=total||parsed.size()!=size||parsed.items().size()!=expected)
