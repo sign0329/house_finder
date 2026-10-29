@@ -1,6 +1,6 @@
 # 기본 서버 배포
 
-서버 한 대에 Caddy + 앱 + PostgreSQL을 실행한다. 로컬 `compose.yaml`/8082와 별개의 `compose.production.yaml`을 사용한다. 현재 서버·도메인은 미정이며 아래 설정만 준비했다. 대용량 최적화, Kubernetes, WAF, 별도 모니터링 서버는 포함하지 않는다.
+서버 한 대에 Caddy + 앱 + PostgreSQL을 실행한다. 로컬 `compose.yaml`/8082와 별개의 `compose.production.yaml`을 사용한다. 2026-10-29 AWS 서버에서 무료 DNS 주소를 통한 HTTPS 공개를 확인했다. 아래는 재현 및 운영 절차다. 대용량 최적화, Kubernetes, WAF, 별도 모니터링 서버는 포함하지 않는다.
 
 ## 서버 준비 후 실행
 
@@ -68,4 +68,13 @@ docker compose --env-file .env.production -f compose.production.yaml up -d --wai
 2. Caddy 설정 검증 및 로컬 CA를 신뢰한 TLS 접속 성공(`-k` 사용 안 함), HTTP→HTTPS 308, 검색 프록시 정상, 외부 health 경로 404. 실제 도메인 공인 인증서 발급은 서버·DNS 마련 후 확인해야 한다.
 3. 백업 스크립트 실행, 파일 권한 600, 별도 임시 PostgreSQL DB에 복원 후 검증용 행 값 일치. 테스트 컨테이너·볼륨만 정리했다.
 
-Java 코드는 변경하지 않았다. 기존 필수 GitHub CI는 그대로 유지한다. 서버 구매/설정, 공인 DNS·TLS, 정기 백업 예약, 외부 백업 복사, 실제 공개는 아직 수행하지 않았다.
+Java 코드는 변경하지 않았다. 기존 필수 GitHub CI는 그대로 유지한다. 위 검증 당시에는 공개 배포 전이었다. 현재 공개 상태는 아래 완료 기록을 따른다. 정기 백업 예약과 서버 외부 백업 운영은 별도 후속 작업이다.
+
+## HTTPS 공개 완료 (2026-10-29)
+
+- URL: https://3-107-167-57.sslip.io/
+- AWS에서 앱·PostgreSQL·Caddy를 재시작하고 모두 healthy 상태를 확인했다.
+- 외부 HTTP 요청은 HTTPS로 308 전환된다. TLS 검증을 생략하지 않은 curl 요청으로 웹 화면과 검색 API를 확인했다.
+- `/api/trades` 결과는 총 726건(종로구 32건, 청주 694건)이다. `/actuator/health` 외부 요청은 404다.
+- DB 및 앱 포트는 호스트에 직접 공개하지 않고 프록시의 80/443만 공개한다. 키 파일·DB 비밀번호·API 키·DB 덤프는 Git에 포함하지 않는다.
+- 무료 IP 기반 DNS 주소를 사용한다. EC2 공인 IP 변경 시 DOMAIN 설정과 안내 링크를 갱신해야 한다. 사이트 운영 여부는 서버 실행 상태에 따라 달라진다.
