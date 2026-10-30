@@ -21,7 +21,7 @@ class NationwideSearchTest {
   db.update("insert into trade(region,district,apartment,address,area,floor,built_year,deal_date,price,source) values(?,'테스트시','검증 아파트','테스트 주소',84,7,2010,'2026-09-15',82500,'MOLIT')",region);
  }
  @Test void allProvincesAvailableEvenWithEmptyDatabase() throws Exception {
-  mvc.perform(get("/")).andExpect(status().isOk()).andExpect(model().attribute("regions",org.hamcrest.Matchers.hasSize(17)))
+  mvc.perform(get("/")).andExpect(status().isOk()).andExpect(model().attribute("regions",org.hamcrest.Matchers.hasSize(18)))
    .andExpect(content().string(org.hamcrest.Matchers.containsString("전국")))
    .andExpect(content().string(org.hamcrest.Matchers.containsString("아직 수집되지 않은")));
  }
@@ -30,6 +30,10 @@ class NationwideSearchTest {
   assertEquals(6,service.search(Map.of()).total());
  }
  @Test void shortAndOfficialProvinceNamesMatchSameTrades() {
+  insert("전남광주통합특별시");insert("광주");insert("전남");
+  assertEquals(1,service.search(Map.of("region","전남광주통합특별시")).total());
+  assertEquals(1,service.search(Map.of("region","광주")).total());
+  assertEquals(1,service.search(Map.of("region","전남")).total());
   insert("강원");insert("강원도");insert("강원특별자치도");insert("전북특별자치도");
   for(String name:List.of("강원","강원도","강원특별자치도"))assertEquals(3,service.search(Map.of("region",name)).total());
   assertEquals(1,service.search(Map.of("region","전북")).total());
