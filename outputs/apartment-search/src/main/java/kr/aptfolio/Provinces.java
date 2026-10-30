@@ -5,7 +5,7 @@ import java.util.List;
 public final class Provinces {
  private Provinces() {}
  private static final List<List<String>> NAMES=List.of(
-  List.of("서울","서울특별시"),List.of("부산","부산광역시"),List.of("대구","대구광역시"),
+  List.of("전남광주통합특별시"),List.of("서울","서울특별시"),List.of("부산","부산광역시"),List.of("대구","대구광역시"),
   List.of("인천","인천광역시"),List.of("광주","광주광역시"),List.of("대전","대전광역시"),
   List.of("울산","울산광역시"),List.of("세종","세종특별자치시"),List.of("경기","경기도"),
   List.of("강원","강원특별자치도","강원도"),List.of("충북","충청북도"),List.of("충남","충청남도"),
