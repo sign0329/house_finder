@@ -1,6 +1,5 @@
 package kr.aptfolio.trade;
 import java.util.*;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,9 +9,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Controller
 public class WebController {
  private final SearchService service;
- @Value("${app.demo:false}") boolean demo;
  public WebController(SearchService service){this.service=service;}
- @ModelAttribute void shared(Model m){m.addAttribute("demo",demo);if(!demo)m.addAttribute("dataNotice",service.dataNotice());m.addAttribute("regions",Provinces.all());}
+ @ModelAttribute void shared(Model m){m.addAttribute("dataNotice",service.dataNotice());m.addAttribute("regions",Provinces.all());}
  @GetMapping("/") String home(@RequestParam Map<String,String> params,Model m){
   var result=service.search(params);m.addAttribute("result",result);m.addAttribute("filters",params);m.addAttribute("selectedRegion",Provinces.canonical(params.getOrDefault("region","")));
   m.addAttribute("previous",pageUrl(params,Math.max(0,result.page()-1)));

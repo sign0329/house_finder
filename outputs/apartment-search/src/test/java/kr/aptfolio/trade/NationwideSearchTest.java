@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(properties={"app.demo=false","spring.datasource.url=jdbc:h2:mem:nationwide;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE"})
+@SpringBootTest(properties={"spring.datasource.url=jdbc:h2:mem:nationwide;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE"})
 @AutoConfigureMockMvc @Transactional
 class NationwideSearchTest {
  @Autowired MockMvc mvc;

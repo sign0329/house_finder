@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
-@SpringBootTest(properties={"app.demo=false","spring.datasource.url=jdbc:h2:mem:molit-test;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE"})
+@SpringBootTest(properties={"spring.datasource.url=jdbc:h2:mem:molit-test;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE"})
 @Transactional
 class MolitTest {
  static final YearMonth MONTH=YearMonth.of(2026,9);

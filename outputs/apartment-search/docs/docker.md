@@ -62,4 +62,4 @@ sh scripts/stack.sh import
 
 ## CI
 
-GitHub의 Java tests에서 합성 데이터로 이미지 빌드, Compose 앱/DB 준비 상태, 검색 240건, 앱 재시작 후 240건 유지를 확인한다. 작업 종료 후 CI 전용 볼륨을 정리한다. 실제 API 키는 CI에 제공하지 않는다. 로컬 실제 수집 결과는 [검증 기록](verification.md)에 별도로 남긴다.
+GitHub의 Java tests에서 이미지 빌드, 빈 DB 검색 0건, CI 전용 SQL fixture 1건 삽입 후 앱 재시작 시 1건 유지를 확인한다. 작업 종료 후 CI 전용 볼륨을 정리한다. 실제 API 키는 CI에 제공하지 않는다. 로컬 실제 수집 결과는 [검증 기록](verification.md)에 별도로 남긴다.

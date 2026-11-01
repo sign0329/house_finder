@@ -5,7 +5,7 @@ spring:
   application:
     name: apartment-search
   profiles:
-    default: demo
+    default: local
   thymeleaf:
     cache: false
 server:
@@ -20,7 +20,6 @@ management:
       exposure:
         include: health
 app:
-  demo: false
   security:
     requests-per-minute: ${REQUESTS_PER_MINUTE:120}
     global-requests-per-minute: ${GLOBAL_REQUESTS_PER_MINUTE:6000}

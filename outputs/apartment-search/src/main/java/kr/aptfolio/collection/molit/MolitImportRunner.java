@@ -13,16 +13,14 @@ public class MolitImportRunner implements CommandLineRunner {
  private static final Logger log=LoggerFactory.getLogger(MolitImportRunner.class);
  private final MolitStore store;
  private final String key,month,regions,from,to;
- private final boolean demo;
  public MolitImportRunner(MolitStore store,@Value("${MOLIT_SERVICE_KEY:}") String key,
-   @Value("${molit.month:202609}") String month,@Value("${app.demo:false}") boolean demo,
+   @Value("${molit.month:202609}") String month,
    @Value("${molit.regions:11110:서울:종로구}") String regions,
    @Value("${molit.from:}") String from,@Value("${molit.to:}") String to) {
-  this.store=store;this.key=key;this.month=month;this.demo=demo;
+  this.store=store;this.key=key;this.month=month;
   this.regions=regions;this.from=from;this.to=to;
  }
  @Override public void run(String...args) {
-  if(demo)throw new IllegalArgumentException("샘플 데이터가 없는 DB에서 수집하세요.");
   var plan=MolitPlan.parse(regions,month,from,to);
   if(key.isBlank())throw new IllegalArgumentException("MOLIT_SERVICE_KEY 환경 변수를 설정하세요.");
   log.info("MOLIT 수집 시작: 지역 {}개, 월 {}개",plan.regions().size(),plan.months().size());
