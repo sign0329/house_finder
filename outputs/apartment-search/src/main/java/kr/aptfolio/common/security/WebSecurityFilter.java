@@ -1,4 +1,4 @@
-package kr.aptfolio;
+package kr.aptfolio.common.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

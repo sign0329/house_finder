@@ -1,4 +1,4 @@
-package kr.aptfolio;
+package kr.aptfolio.trade;
 import java.util.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

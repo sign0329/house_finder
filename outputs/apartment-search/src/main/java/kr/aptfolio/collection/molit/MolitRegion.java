@@ -1,4 +1,4 @@
-package kr.aptfolio.molit;
+package kr.aptfolio.collection.molit;
 
 /** Explicit API region code and display labels; labels are operator supplied. */
 public record MolitRegion(String code, String province, String district) {

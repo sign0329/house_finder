@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import kr.aptfolio.SearchService;
-import kr.aptfolio.molit.MolitStore;
-import kr.aptfolio.molit.MolitXml;
+import kr.aptfolio.trade.SearchService;
+import kr.aptfolio.collection.molit.MolitStore;
+import kr.aptfolio.collection.molit.MolitXml;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +65,7 @@ class PostgresIT {
   assertEquals("legacy-key",db.queryForObject("select source_key from upgrade_test.trade",String.class));
  }
  @Test void regionSnapshotsAreIsolatedOnPostgres() {
-  var region=new kr.aptfolio.molit.MolitRegion("11680","서울","강남구");
+  var region=new kr.aptfolio.collection.molit.MolitRegion("11680","서울","강남구");
   var jongno=new MolitXml.Item("동일 이름","서울 종로구 테스트동 1",new BigDecimal("84.95"),7,2010,LocalDate.of(2026,9,15),82500,false);
   var gangnam=new MolitXml.Item("동일 이름","서울 강남구 테스트동 1",new BigDecimal("84.95"),7,2010,LocalDate.of(2026,9,15),82500,false);
   store.replace(MONTH,List.of(jongno));store.replace(region,MONTH,List.of(gangnam));

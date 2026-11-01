@@ -1,4 +1,4 @@
-package kr.aptfolio;
+package kr.aptfolio.trade;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 public record Trade(long id, String region, String district, String apartment, String address,

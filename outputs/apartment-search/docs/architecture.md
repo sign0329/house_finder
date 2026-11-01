@@ -47,3 +47,24 @@ MolitImportRunner → MolitPlan(범위 검증) → MolitCollector(구간 순차 
 `compose.postgres.yaml`은 IntelliJ 앱을 위한 전용 PostgreSQL 개발 DB다. Testcontainers 통합 테스트는 개발 DB를 사용하지 않고 새 PostgreSQL 17 컨테이너를 임의 포트로 만들고 정리한다. Maven `postgres-it` 프로필에서 Failsafe를 실행하며 Docker가 없으면 실패한다. CI의 필수 Java tests에 이 프로필을 포함한다.
 
 V4는 source_region을 추가하고 기존 종로구 행을 보정한다. 스냅샷 삭제는 지역 코드와 계약월로 제한한다. 구간별 트랜잭션이라 일부 실패해도 성공한 구간은 유지된다. 상세 실행 정책은 public-api.md를 따른다.
+
+## 기능별 패키지 구조
+
+```text
+kr.aptfolio
+├── ApartmentApplication       # IDE/배포의 실행 진입점 유지
+├── trade                      # 거래 검색·상세·화면·시도 선택
+│   ├── Trade
+│   ├── SearchService
+│   ├── WebController
+│   └── Provinces
+├── collection.molit           # 국토부 API·수집 계획·저장
+├── common.security            # 웹 보안 및 요청 제한
+└── demo                       # 샘플 데이터 초기화
+```
+
+기능 내부 클래스는 같은 패키지에 모은다. 현재 크기에서는 controller/service/repository 하위 패키지를 추가하지 않는다. 테스트도 trade, collection.molit, common.security에 대응시키며, 여러 기능을 함께 검증하는 PostgreSQL 통합 테스트는 postgres에 유지한다.
+
+패키지 이동만 수행했으며 클래스 이름, URL, 응답, SQL, 설정 키, 마이그레이션은 유지한다. ApartmentApplication은 루트에 있어 하위 패키지가 기존 컴포넌트 스캔에 포함된다. IDE 실행 클래스도 바꿀 필요가 없다.
+
+업데이트 후에는 Maven clean verify 또는 IDE Rebuild로 이전 패키지의 컴파일 산출물을 제거한다. 오래된 target/classes를 남겨 두면 이전·새 패키지의 동일 이름 빈이 함께 발견될 수 있다. Docker 이미지는 새 소스로 다시 빌드해야 한다. 실행 중인 컨테이너나 수집 데이터는 이 코드 변경만으로 갱신되지 않는다.

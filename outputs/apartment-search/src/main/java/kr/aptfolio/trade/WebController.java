@@ -1,4 +1,4 @@
-package kr.aptfolio;
+package kr.aptfolio.trade;
 import java.util.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
