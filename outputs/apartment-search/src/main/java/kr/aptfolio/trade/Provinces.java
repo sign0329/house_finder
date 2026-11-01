@@ -1,4 +1,4 @@
-package kr.aptfolio;
+package kr.aptfolio.trade;
 import java.util.List;
 
 /** Province labels and historical aliases. No network call is made during search. */

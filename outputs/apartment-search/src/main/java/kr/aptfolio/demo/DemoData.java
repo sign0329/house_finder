@@ -1,4 +1,4 @@
-package kr.aptfolio;
+package kr.aptfolio.demo;
 import java.time.LocalDate;
 import java.math.BigDecimal;
 import java.util.Random;

@@ -1,4 +1,4 @@
-package kr.aptfolio.molit;
+package kr.aptfolio.collection.molit;
 
 import java.time.YearMonth;
 import java.util.ArrayList;

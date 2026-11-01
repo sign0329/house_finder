@@ -1,4 +1,4 @@
-package kr.aptfolio;
+package kr.aptfolio.common.security;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 class RequestLimitTest {
