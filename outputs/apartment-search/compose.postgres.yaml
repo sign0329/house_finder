@@ -1,5 +1,5 @@
 # Database-only environment for running the app from IntelliJ/Maven.
-# Separate project/volume from compose.yaml and from H2 demo data.
+# Separate project/volume from compose.yaml and from local H2 data.
 name: house-finder-postgres
 services:
   db:

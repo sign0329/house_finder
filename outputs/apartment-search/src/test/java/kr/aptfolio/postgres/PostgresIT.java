@@ -76,9 +76,12 @@ class PostgresIT {
   assertEquals(1,db.queryForObject("select count(*) from trade where source_region='11680'",Integer.class));
   assertEquals(1,search.search(Map.of("q","강남구","from","2026-09-01","to","2026-09-30")).total());
  }
+ @Test void sourceMustBeExplicitInsteadOfDefaultingToDemo() {
+  assertThrows(DataIntegrityViolationException.class,()->db.update("insert into trade(region,district,apartment,address,area,floor,built_year,deal_date,price) values('서울','검증구','검증','주소',84,1,2010,'2026-09-01',100)"));
+ }
  @Test void appliesAllMigrationsOnPostgres17() {
   assertTrue(db.queryForObject("select version()",String.class).startsWith("PostgreSQL 17."));
-  assertEquals(4,db.queryForObject("select count(*) from flyway_schema_history where success=true and type='SQL'",Integer.class));
+  assertEquals(5,db.queryForObject("select count(*) from flyway_schema_history where success=true and type='SQL'",Integer.class));
   assertEquals(4,db.queryForObject("select numeric_scale from information_schema.columns where table_schema='public' and table_name='trade' and column_name='area'",Integer.class));
   assertEquals(1,db.queryForObject("select count(*) from pg_indexes where schemaname='public' and indexname='idx_trade_source_key'",Integer.class));
  }
@@ -136,8 +139,8 @@ class PostgresIT {
   assertEquals(expected,db.queryForObject("select last_count from molit_import_state where id=1",Integer.class));
  }
  @Test void refusesDemoRowsWithoutDeletingThem() {
-  db.update("insert into trade(region,district,apartment,address,area,floor,built_year,deal_date,price) values('서울','종로구','가상','주소',84,1,2010,'2026-09-01',100)");
+  db.update("insert into trade(region,district,apartment,address,area,floor,built_year,deal_date,price,source) values('서울','종로구','가상','주소',84,1,2010,'2026-09-01',100,'TEST')");
   assertThrows(IllegalArgumentException.class,()->store.replace(MONTH,List.of(item("실제"))));
-  assertEquals("DEMO",db.queryForObject("select source from trade",String.class));
+  assertEquals("TEST",db.queryForObject("select source from trade",String.class));
  }
 }
