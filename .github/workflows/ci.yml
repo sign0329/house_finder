@@ -38,21 +38,21 @@ jobs:
         run: python3 scripts/test_collect_nationwide.py
       - name: Build and test without public API credentials
         run: sh ./mvnw -B -ntp -Ppostgres-it clean verify
-      - name: Build and start container stack with synthetic data
+      - name: Build and start container stack with an empty database
         env:
           DB_PASSWORD: disposable-ci-database
-          DEMO_DATA: 'true'
           PORT: '8082'
         run: docker compose up -d --build --wait app
       - name: Verify container search and restart persistence
         env:
           DB_PASSWORD: disposable-ci-database
-          DEMO_DATA: 'true'
           PORT: '8082'
         run: |
-          curl --fail --silent http://127.0.0.1:8082/api/trades | python3 -c 'import json,sys; assert json.load(sys.stdin)["total"] == 240'
+          curl --fail --silent http://127.0.0.1:8082/api/trades | python3 -c 'import json,sys; assert json.load(sys.stdin)["total"] == 0'
+          docker compose exec -T db psql -U apartments -d apartments -c "INSERT INTO trade(region,district,apartment,address,area,floor,built_year,deal_date,price,source) VALUES ('서울','검증구','CI fixture','CI address',84,1,2020,'2026-09-01',10000,'TEST');"
           docker compose restart app
           docker compose up -d --wait app
+          curl --fail --silent http://127.0.0.1:8082/api/trades | python3 -c 'import json,sys; assert json.load(sys.stdin)["total"] == 1'
       - name: Stop disposable CI stack
         if: always()
         env:

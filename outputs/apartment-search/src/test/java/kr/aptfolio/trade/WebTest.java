@@ -8,10 +8,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.hamcrest.Matchers.*;
 @SpringBootTest @AutoConfigureMockMvc
+@org.springframework.test.context.jdbc.Sql("/fixtures/search.sql")
 class WebTest {
  @Autowired MockMvc mvc;
- @Test void rendersSearchAndDisclosesDemo() throws Exception {
-  mvc.perform(get("/")).andExpect(status().isOk()).andExpect(content().string(containsString("가상 거래 데이터")));
+ @Test void rendersSearchWithoutDemo() throws Exception {
+  mvc.perform(get("/")).andExpect(status().isOk()).andExpect(content().string(not(containsString("가상 거래 데이터"))));
  }
  @Test void filtersByRegionAndName() throws Exception {
   mvc.perform(get("/api/trades").param("region","서울").param("q","한강"))

@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /** Real PostgreSQL, never a production URL. Docker absence fails this opt-in suite. */
 @Testcontainers
 @ActiveProfiles("postgres")
-@SpringBootTest(properties={"app.demo=false","molit.import-on-start=false"})
+@SpringBootTest(properties={"molit.import-on-start=false"})
 @AutoConfigureMockMvc
 class PostgresIT {
  @Container static final PostgreSQLContainer postgres=new PostgreSQLContainer("postgres:17-alpine");

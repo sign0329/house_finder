@@ -1,12 +1,11 @@
 # 구조와 선택
 
-브라우저 → Spring MVC/Thymeleaf → SearchService → JDBC → H2(demo) / PostgreSQL(postgres).
+브라우저 → Spring MVC/Thymeleaf → SearchService → JDBC → H2(local) / PostgreSQL(postgres).
 Flyway로 두 환경에 동일한 기본 테이블과 인덱스를 생성한다.
 
-기본 demo 프로필은 외부 서비스 없이 부팅되도록 메모리 H2를 사용한다. 재시작 시 초기화된다.
+기본 local 프로필은 외부 서비스 없이 부팅되도록 메모리 H2를 사용한다. 재시작 시 초기화된다.
 postgres 프로필은 DB_PASSWORD를 요구하고 기본적으로 샘플 데이터 입력을 하지 않는다.
-compose 데모를 사용하려면 .env.example의 DEMO_DATA=true를 사용한다.
-샘플 데이터는 DB가 비었을 때만 입력한다. 플래그를 false로 바꿔도 기존 데이터는 삭제하지 않는다.
+자동 샘플 데이터 생성과 DEMO_DATA 설정은 제거했다. 테스트 fixture는 테스트 소스에만 존재한다.
 실제 데이터 연결 시 별도 DB로 시작한다.
 
 거래 상세 URL은 거래 ID를 가리킨다. 관심 저장은 주소와 이름으로 묶지만 링크는 저장 시점의 거래 ID다.
@@ -36,7 +35,7 @@ AWS 배포 후보: EC2 + Docker, 필요에 따라 RDS 분리. 리소스는 생�
 
 ## 보안 경계
 
-요청은 WebSecurityFilter를 통과한다. SQL 값은 바인딩하며 정렬 SQL은 허용 목록에서 선택한다. 기본 demo는 로컬 접속만 허용한다. 전달 헤더를 자동 신뢰하지 않고 요청 제한은 실제 연결 IP에 적용한다. 따라서 프록시 뒤에서는 프록시 IP로 집계될 수 있으며 운영 구성에서 별도 설계가 필요하다.
+요청은 WebSecurityFilter를 통과한다. SQL 값은 바인딩하며 정렬 SQL은 허용 목록에서 선택한다. 기본 local은 로컬 접속만 허용한다. 전달 헤더를 자동 신뢰하지 않고 요청 제한은 실제 연결 IP에 적용한다. 따라서 프록시 뒤에서는 프록시 IP로 집계될 수 있으며 운영 구성에서 별도 설계가 필요하다.
 
 ## 공공데이터 수집 경로
 
@@ -59,8 +58,7 @@ kr.aptfolio
 │   ├── WebController
 │   └── Provinces
 ├── collection.molit           # 국토부 API·수집 계획·저장
-├── common.security            # 웹 보안 및 요청 제한
-└── demo                       # 샘플 데이터 초기화
+└── common.security            # 웹 보안 및 요청 제한
 ```
 
 기능 내부 클래스는 같은 패키지에 모은다. 현재 크기에서는 controller/service/repository 하위 패키지를 추가하지 않는다. 테스트도 trade, collection.molit, common.security에 대응시키며, 여러 기능을 함께 검증하는 PostgreSQL 통합 테스트는 postgres에 유지한다.
@@ -68,3 +66,5 @@ kr.aptfolio
 패키지 이동만 수행했으며 클래스 이름, URL, 응답, SQL, 설정 키, 마이그레이션은 유지한다. ApartmentApplication은 루트에 있어 하위 패키지가 기존 컴포넌트 스캔에 포함된다. IDE 실행 클래스도 바꿀 필요가 없다.
 
 업데이트 후에는 Maven clean verify 또는 IDE Rebuild로 이전 패키지의 컴파일 산출물을 제거한다. 오래된 target/classes를 남겨 두면 이전·새 패키지의 동일 이름 빈이 함께 발견될 수 있다. Docker 이미지는 새 소스로 다시 빌드해야 한다. 실행 중인 컨테이너나 수집 데이터는 이 코드 변경만으로 갱신되지 않는다.
+
+기존 Flyway V1의 source 기본값 DEMO는 체크섬 호환을 위해 변경하지 않았다. 운영 저장 경로는 출처 MOLIT를 명시하며, 레거시 비-MOLIT 데이터 혼합 거부 로직도 유지한다. 과거 검증 문서의 240건 데모 기록은 당시 결과다.

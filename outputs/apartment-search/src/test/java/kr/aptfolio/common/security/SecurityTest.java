@@ -11,7 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(properties="app.security.requests-per-minute=2") @AutoConfigureMockMvc
 class SecurityTest {
  @Autowired MockMvc mvc; @Autowired Environment env;
- @Test void demoIsLoopbackOnly(){assertThat(env.getProperty("server.address")).isEqualTo("127.0.0.1");}
+ @Test void localIsLoopbackOnly(){assertThat(env.getProperty("server.address")).isEqualTo("127.0.0.1");}
  @Test void securityHeaders() throws Exception {mvc.perform(get("/").with(r->{r.setRemoteAddr("192.0.2.1");return r;}))
   .andExpect(header().string("X-Content-Type-Options","nosniff"))
   .andExpect(header().string("X-Frame-Options","DENY"))

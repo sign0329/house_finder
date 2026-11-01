@@ -1,11 +1,9 @@
-# Persistent local database, isolated from the generated demo data.
+# Persistent local database, for explicit local public-data use.
 spring:
   datasource:
     url: jdbc:h2:file:./data/molit;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE
     username: sa
     password:
-app:
-  demo: false
 server:
   address: 127.0.0.1
 molit:

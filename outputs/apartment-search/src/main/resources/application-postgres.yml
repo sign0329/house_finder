@@ -7,5 +7,3 @@ spring:
       maximum-pool-size: ${DB_POOL_SIZE:10}
   thymeleaf:
     cache: true
-app:
-  demo: ${DEMO_DATA:false}
