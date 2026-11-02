@@ -43,10 +43,12 @@ class PostgresIT {
  }
  @Autowired JdbcTemplate db;
  @Autowired MolitStore store;
+ @Autowired kr.aptfolio.collection.jobs.CollectionJobs jobs;
  @Autowired SearchService search;
  @Autowired MockMvc mvc;
  static final YearMonth MONTH=YearMonth.of(2026,9);
  @BeforeEach void resetOnlyContainerData() {
+  db.update("delete from collection_job");
   db.update("delete from trade");
   db.update("update molit_import_state set last_month=null,last_count=null,updated_at=null where id=1");
  }
@@ -76,12 +78,34 @@ class PostgresIT {
   assertEquals(1,db.queryForObject("select count(*) from trade where source_region='11680'",Integer.class));
   assertEquals(1,search.search(Map.of("q","강남구","from","2026-09-01","to","2026-09-30")).total());
  }
+ @Test void concurrentClaimsCreateOnlyOneRunningJob() throws Exception {
+  var gate=new CountDownLatch(1);var region=kr.aptfolio.collection.molit.MolitRegion.JONGNO;
+  try(var pool=Executors.newFixedThreadPool(2)){
+   java.util.concurrent.Callable<Boolean> claim=()->{gate.await();try{jobs.start(region,MONTH);return true;}catch(IllegalStateException e){return false;}};
+   var a=pool.submit(claim);var b=pool.submit(claim);gate.countDown();
+   assertNotEquals(a.get(10,TimeUnit.SECONDS),b.get(10,TimeUnit.SECONDS));
+  }
+  assertEquals(1,db.queryForObject("select count(*) from collection_job where status='RUNNING'",Integer.class));
+ }
+ @Test void jobPublicationAndStaleWorkerFencingOnPostgres(){
+  var id=jobs.start(kr.aptfolio.collection.molit.MolitRegion.JONGNO,MONTH);
+  assertThrows(DataIntegrityViolationException.class,()->jobs.complete(id,List.of(item("valid"),item("bad",-1,MONTH.atDay(1),false))));
+  assertEquals(0,db.queryForObject("select count(*) from trade",Integer.class));
+  assertEquals("RUNNING",jobs.get(id).status());
+  jobs.complete(id,List.of(item("valid")));assertEquals("SUCCEEDED",jobs.get(id).status());
+  var expired=jobs.start(kr.aptfolio.collection.molit.MolitRegion.JONGNO,MONTH);
+  db.update("update collection_job set lease_until=TIMESTAMP '2000-01-01 00:00:00' where id=?",expired);
+  jobs.recover();var retry=jobs.retry(expired);
+  assertThrows(IllegalStateException.class,()->jobs.complete(expired,List.of()));
+  assertEquals(1,db.queryForObject("select count(*) from trade",Integer.class));
+  jobs.complete(retry,List.of());assertEquals(2,jobs.get(expired).attempt());
+ }
  @Test void sourceMustBeExplicitInsteadOfDefaultingToDemo() {
   assertThrows(DataIntegrityViolationException.class,()->db.update("insert into trade(region,district,apartment,address,area,floor,built_year,deal_date,price) values('서울','검증구','검증','주소',84,1,2010,'2026-09-01',100)"));
  }
  @Test void appliesAllMigrationsOnPostgres17() {
   assertTrue(db.queryForObject("select version()",String.class).startsWith("PostgreSQL 17."));
-  assertEquals(5,db.queryForObject("select count(*) from flyway_schema_history where success=true and type='SQL'",Integer.class));
+  assertEquals(6,db.queryForObject("select count(*) from flyway_schema_history where success=true and type='SQL'",Integer.class));
   assertEquals(4,db.queryForObject("select numeric_scale from information_schema.columns where table_schema='public' and table_name='trade' and column_name='area'",Integer.class));
   assertEquals(1,db.queryForObject("select count(*) from pg_indexes where schemaname='public' and indexname='idx_trade_source_key'",Integer.class));
  }

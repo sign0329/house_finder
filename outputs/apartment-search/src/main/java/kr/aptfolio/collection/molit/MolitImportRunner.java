@@ -12,19 +12,20 @@ import org.springframework.stereotype.Component;
 public class MolitImportRunner implements CommandLineRunner {
  private static final Logger log=LoggerFactory.getLogger(MolitImportRunner.class);
  private final MolitStore store;
+ private final kr.aptfolio.collection.jobs.CollectionJobs jobs;
  private final String key,month,regions,from,to;
- public MolitImportRunner(MolitStore store,@Value("${MOLIT_SERVICE_KEY:}") String key,
+ public MolitImportRunner(MolitStore store,kr.aptfolio.collection.jobs.CollectionJobs jobs,@Value("${MOLIT_SERVICE_KEY:}") String key,
    @Value("${molit.month:202609}") String month,
    @Value("${molit.regions:11110:서울:종로구}") String regions,
    @Value("${molit.from:}") String from,@Value("${molit.to:}") String to) {
-  this.store=store;this.key=key;this.month=month;
+  this.store=store;this.jobs=jobs;this.key=key;this.month=month;
   this.regions=regions;this.from=from;this.to=to;
  }
  @Override public void run(String...args) {
   var plan=MolitPlan.parse(regions,month,from,to);
   if(key.isBlank())throw new IllegalArgumentException("MOLIT_SERVICE_KEY 환경 변수를 설정하세요.");
   log.info("MOLIT 수집 시작: 지역 {}개, 월 {}개",plan.regions().size(),plan.months().size());
-  var results=new MolitCollector(MolitClient.live(key),store).collect(plan,result->{
+  var results=new MolitCollector(MolitClient.live(key),store,jobs).collect(plan,result->{
    if(result.success())log.info("MOLIT 성공: 지역 {}, 계약월 {}, 저장 {}건, 해제 제외 {}건",result.regionCode(),result.month(),result.saved(),result.cancelled());
    else log.error("MOLIT 실패: 지역 {}, 계약월 {}. 해당 구간 기존 데이터 유지; 인증·한도·네트워크·응답을 확인하세요.",result.regionCode(),result.month());
   });
