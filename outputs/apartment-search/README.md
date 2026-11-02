@@ -150,3 +150,5 @@ Caddy 자동 HTTPS, 앱·DB 포트 비공개, 로컬 환경변수 파일, DB 백
 전국 수집 준비·재개 방법: [수집 운영 안내](docs/nationwide-collection.md).
 
 데모 자동 생성과 DEMO_DATA 설정은 제거했습니다. 실제 거래는 postgres 또는 molit 프로필로 조회합니다. 이전 demo 실행 설정은 local로 변경하세요. 테스트 fixture는 src/test에만 존재하며 배포 JAR에 포함하지 않습니다. 기존 DB 데이터는 자동 삭제하지 않습니다.
+
+수집 작업 DB 이력·관리 API·실패 재시도: [운영 안내](docs/collection-jobs.md). 기본 비활성화이며 전용 관리 토큰 설정이 필요합니다.
