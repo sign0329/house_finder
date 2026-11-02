@@ -24,7 +24,7 @@ public class MolitStore {
  public int replace(MolitRegion region,YearMonth month,List<MolitXml.Item> items) {
   db.queryForObject("select id from molit_import_state where id=1 for update",Integer.class);
   if(db.queryForObject("select count(*) from trade where source <> 'MOLIT'",Long.class)>0)
-   throw new IllegalArgumentException("가상 데이터가 있는 DB에는 수집할 수 없습니다. molit 프로필의 별도 DB를 사용하세요.");
+   throw new IllegalArgumentException("다른 출처의 데이터가 있는 DB에는 수집할 수 없습니다. 공공데이터 전용 DB를 사용하세요.");
   String ym=month.format(DateTimeFormatter.ofPattern("yyyyMM"));String snapshot=UUID.randomUUID().toString();
   var occurrences=new HashMap<String,Integer>();int count=0;
   for(var item:items) {
