@@ -74,6 +74,31 @@ class CollectionJobApiTest {
   mvc.perform(get(PATH+"/coverage").header("X-Collection-Token",TOKEN).param("regionCode","bad").param("from","202609").param("to","202609")).andExpect(status().isBadRequest());
   verifyNoInteractions(client);
  }
+ @Test void failuresRequireTokenAndValidateLimit() throws Exception {
+  mvc.perform(get(PATH+"/failures")).andExpect(status().isUnauthorized());
+  mvc.perform(get(PATH+"/failures").header("X-Collection-Token",TOKEN).param("limit","101")).andExpect(status().isBadRequest());
+  mvc.perform(get(PATH+"/failures").header("X-Collection-Token",TOKEN)).andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(0));
+  verifyNoInteractions(client);
+ }
+ @Test void failuresIncludeOldErrorsEvenWhenRecentJobsAreSuccessful() throws Exception {
+  var region=kr.aptfolio.collection.molit.MolitRegion.JONGNO;var month=java.time.YearMonth.of(2026,9);
+  var old=jobs.start(region,month);jobs.fail(old,"FETCH_FAILED");
+  for(int i=0;i<101;i++) db.update("insert into collection_job(id,region_code,province,district,deal_month,status,attempt,lease_until) values(?, '11110','서울','종로구','202609','SUCCEEDED',?,CURRENT_TIMESTAMP)","success-"+i,i+2);
+  mvc.perform(get(PATH+"/failures").header("X-Collection-Token",TOKEN))
+   .andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(1))
+   .andExpect(jsonPath("$[0].job.id").value(old)).andExpect(jsonPath("$[0].retryable").value(false));
+ }
+ @Test void failuresRecoverExpiredJobsAndAllowOnlyLatestRetry() throws Exception {
+  var region=kr.aptfolio.collection.molit.MolitRegion.JONGNO;var month=java.time.YearMonth.of(2026,9);
+  var failed=jobs.start(region,month);jobs.fail(failed,"STORE_FAILED");var running=jobs.retry(failed);
+  db.update("update collection_job set lease_until=TIMESTAMP '2000-01-01 00:00:00' where id=?",running);
+  mvc.perform(get(PATH+"/failures").header("X-Collection-Token",TOKEN))
+   .andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(2))
+   .andExpect(jsonPath("$[?(@.job.id == '"+running+"')].job.failureType").value(org.hamcrest.Matchers.contains("LEASE_EXPIRED")))
+   .andExpect(jsonPath("$[?(@.job.id == '"+running+"')].retryable").value(org.hamcrest.Matchers.contains(true)))
+   .andExpect(jsonPath("$[?(@.job.id == '"+failed+"')].retryable").value(org.hamcrest.Matchers.contains(false)));
+  verifyNoInteractions(client);
+ }
  private void awaitStatus(String expected) throws Exception {
   for(int i=0;i<100;i++){if(jobs.list(1).getFirst().status().equals(expected))return;Thread.sleep(20);}
   fail("worker did not reach "+expected);

@@ -52,4 +52,16 @@ public class CollectionJobs {
  }
  public Job get(String id){return db.query("select * from collection_job where id=?",row,id).stream().findFirst().orElseThrow(()->new NoSuchElementException("작업이 없습니다."));}
  public List<Job> list(int limit){if(limit<1||limit>100)throw new IllegalArgumentException("limit는 1~100");return db.query("select * from collection_job order by started_at desc,id desc limit ?",row,limit);}
+ public record Failure(Job job, boolean retryable) {}
+ public List<Failure> failures(int limit) {
+  if(limit<1||limit>100)throw new IllegalArgumentException("limit는 1~100");
+  return new org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate(db).query("""
+   select j.*, not exists (
+    select 1 from collection_job newer where newer.region_code=j.region_code
+     and newer.deal_month=j.deal_month and newer.attempt>j.attempt
+   ) as retryable
+   from collection_job j where j.status in ('FAILED','INTERRUPTED')
+   order by j.finished_at desc,j.started_at desc,j.id desc limit :limit
+   """, java.util.Map.of("limit",limit),(r,n)->new Failure(row.mapRow(r,n),r.getBoolean("retryable")));
+ }
 }

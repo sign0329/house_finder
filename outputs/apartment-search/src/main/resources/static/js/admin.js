@@ -4,10 +4,10 @@
   const endpoint = '/api/admin/collection-jobs';
   const statuses = {RUNNING:'실행 중', SUCCEEDED:'성공', FAILED:'실패', INTERRUPTED:'중단'};
   const failures = {FETCH_FAILED:'공공 API 호출 실패', STORE_FAILED:'저장 실패', EXECUTOR_BUSY:'다른 수집 실행 중', LEASE_EXPIRED:'작업 유효 시간 만료'};
-  let token = '', jobs = [], busy = false, generation = 0;
+  let token = '', jobs = [], failedJobs = [], busy = false, generation = 0;
   function message(text, error = false) { $('message').textContent = text; $('message').className = error ? 'error' : ''; }
   function disconnect() {
-    generation++; token = ''; jobs = []; $('token').value = ''; $('jobs').replaceChildren(); $('coverage-rows').replaceChildren(); $('coverage-message').textContent = '조회할 지역과 기간을 입력하세요.';
+    generation++; token = ''; jobs = []; failedJobs = []; $('failure-rows').replaceChildren(); $('failure-summary').textContent = ''; $('token').value = ''; $('jobs').replaceChildren(); $('coverage-rows').replaceChildren(); $('coverage-message').textContent = '조회할 지역과 기간을 입력하세요.';
     $('workspace').hidden = true; $('login-panel').hidden = false;
   }
   async function request(path = '', body) {
@@ -49,11 +49,34 @@
       $('jobs').append(row);
     }
   }
+  function renderFailures() {
+    const advice = {FETCH_FAILED:'API 키·호출 한도·네트워크 상태 확인', STORE_FAILED:'DB 연결·제약조건·저장 로그 확인', EXECUTOR_BUSY:'실행 중인 작업 종료 후 재시도', LEASE_EXPIRED:'작업 중단 여부와 서버 상태 확인'};
+    const selected = failedJobs.filter(entry => !$('failure-type').value || entry.job.failureType === $('failure-type').value);
+    $('failure-summary').textContent = failedJobs.length ? '조회된 실패 ' + failedJobs.length + '건 · 표시 ' + selected.length + '건' : '기록된 실패·중단 작업이 없습니다.';
+    $('failure-rows').replaceChildren();
+    for (const entry of selected) {
+      const job = entry.job; const row = document.createElement('tr');
+      const cell = text => { const td = document.createElement('td'); td.textContent = text; row.append(td); return td; };
+      const location = cell(job.province + ' ' + job.district + ' (' + job.regionCode + ')');
+      const id = document.createElement('small'); id.textContent = job.id; location.append(id);
+      cell(job.month + ' / ' + job.attempt + '회'); cell(statuses[job.status] || job.status);
+      const reason = cell(failures[job.failureType] || '분류되지 않은 오류');
+      const tip = document.createElement('small'); tip.textContent = advice[job.failureType] || '서버 로그 확인'; reason.append(tip);
+      cell(job.finishedAt ? job.finishedAt.replace('T',' ') : '확인 불가');
+      const action = cell(entry.retryable ? '' : '후속 시도 있음');
+      if (entry.retryable) {
+        const button = document.createElement('button'); button.textContent = '재시도'; button.className = 'secondary';
+        button.addEventListener('click', () => mutate('/' + encodeURIComponent(job.id) + '/retry', {}, job.province + ' ' + job.district + ' ' + job.month + ' 실패 작업을 다시 수집할까요?')); action.append(button);
+      }
+      $('failure-rows').append(row);
+    }
+  }
+  $('failure-type').addEventListener('change', renderFailures);
   async function refresh() {
     const current = generation;
-    const result = await request('?limit=100');
+    const [result, failureResult] = await Promise.all([request('?limit=100'),request('/failures?limit=100')]);
     if (current !== generation) return;
-    jobs = result; render(); $('workspace').hidden = false; $('login-panel').hidden = true;
+    jobs = result; failedJobs = failureResult; render(); renderFailures(); $('workspace').hidden = false; $('login-panel').hidden = true;
   }
   async function run(action) {
     if (busy) return; busy = true;

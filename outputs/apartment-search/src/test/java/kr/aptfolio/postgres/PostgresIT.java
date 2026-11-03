@@ -57,6 +57,14 @@ class PostgresIT {
   return new MolitXml.Item(name,"서울 종로구 테스트동 1",new BigDecimal("84.9512"),7,2010,date,price,cancelled);
  }
  private static MolitXml.Item item(String name) {return item(name,82500,LocalDate.of(2026,9,15),false);}
+ @Test void failureListOnPostgresExcludesSuccessAndDisablesStaleRetry() {
+  var region=kr.aptfolio.collection.molit.MolitRegion.JONGNO;
+  var failed=jobs.start(region,MONTH);jobs.fail(failed,"EXECUTOR_BUSY");
+  assertTrue(jobs.failures(100).getFirst().retryable());
+  jobs.complete(jobs.retry(failed),List.of());
+  var rows=jobs.failures(100);assertEquals(1,rows.size());
+  assertEquals(failed,rows.getFirst().job().id());assertFalse(rows.getFirst().retryable());
+ }
  @Test void coverageAggregatesPostgresRowsAndKeepsLastSuccessfulTimestamp() {
   var region=kr.aptfolio.collection.molit.MolitRegion.JONGNO;
   jobs.complete(jobs.start(region,MONTH),List.of(item("거래")));
