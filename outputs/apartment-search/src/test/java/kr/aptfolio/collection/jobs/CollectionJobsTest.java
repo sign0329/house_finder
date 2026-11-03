@@ -17,6 +17,9 @@ class CollectionJobsTest {
  final MolitRegion region=MolitRegion.JONGNO;
  final YearMonth month=YearMonth.of(2026,9);
  @BeforeEach void reset(){db.update("delete from collection_job");db.update("delete from trade");}
+ @Test void adminPageDisabledByDefault() throws Exception {
+  mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/admin")).andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isNotFound());
+ }
  @Test void adminApiDisabledByDefault() throws Exception {
   mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/api/admin/collection-jobs")).andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isNotFound());
  }

@@ -18,6 +18,14 @@ class CollectionJobApiTest {
  @MockitoBean MolitClient client;
  static final String PATH="/api/admin/collection-jobs",TOKEN="01234567890123456789012345678901";
  @BeforeEach void reset(){db.update("delete from collection_job");db.update("delete from trade");}
+ @Test void adminPageRendersOnlyShellWithoutCredentialsOrJobData() throws Exception {
+  mvc.perform(get("/admin")).andExpect(status().isOk())
+   .andExpect(view().name("admin"))
+   .andExpect(header().string("Cache-Control","no-store"))
+   .andExpect(content().string(org.hamcrest.Matchers.containsString("수집 관리")))
+   .andExpect(content().string(org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString(TOKEN))));
+  verifyNoInteractions(client);
+ }
  @Test void rejectsMissingOrWrongTokenWithoutCallingUpstream() throws Exception {
   mvc.perform(get(PATH)).andExpect(status().isUnauthorized());
   mvc.perform(post(PATH).header("X-Collection-Token","wrong").contentType("application/json").content("{}")).andExpect(status().isUnauthorized());verifyNoInteractions(client);
