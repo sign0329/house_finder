@@ -7,7 +7,7 @@
   let token = '', jobs = [], busy = false, generation = 0;
   function message(text, error = false) { $('message').textContent = text; $('message').className = error ? 'error' : ''; }
   function disconnect() {
-    generation++; token = ''; jobs = []; $('token').value = ''; $('jobs').replaceChildren();
+    generation++; token = ''; jobs = []; $('token').value = ''; $('jobs').replaceChildren(); $('coverage-rows').replaceChildren(); $('coverage-message').textContent = '조회할 지역과 기간을 입력하세요.';
     $('workspace').hidden = true; $('login-panel').hidden = false;
   }
   async function request(path = '', body) {
@@ -59,7 +59,7 @@
     if (busy) return; busy = true;
     document.querySelectorAll('button').forEach(b => b.disabled = true);
     try { await action(); } catch (e) { message(e instanceof TypeError ? '서버에 연결할 수 없습니다. 네트워크를 확인하세요.' : e.message, true); }
-    finally { busy = false; document.querySelectorAll('button').forEach(b => b.disabled = false); }
+    finally { busy = false; document.querySelectorAll('button').forEach(b => b.disabled = b.dataset.running === 'true'); }
   }
   function mutate(path, body, question) {
     if (busy || !window.confirm(question)) return;
@@ -68,11 +68,45 @@
       try { await refresh(); } catch (e) { message('요청은 접수됐지만 목록 갱신에 실패했습니다. 재요청하지 말고 새로고침하세요.', true); }
     });
   }
+  $('coverage-form').addEventListener('submit', event => {
+    event.preventDefault();
+    const params = Object.fromEntries(new FormData(event.target));
+    params.from = params.from.replace('-',''); params.to = params.to.replace('-','');
+    run(async () => {
+      $('coverage-rows').replaceChildren(); $('coverage-message').textContent = '현황을 조회하고 있습니다.';
+      try {
+        const result = await request('/coverage?' + new URLSearchParams(params));
+        let sum = 0;
+        for (const item of result) {
+          sum += item.tradeCount;
+          const row = document.createElement('tr');
+          const label = item.status === 'SUCCEEDED' && item.tradeCount === 0 ? '수집 성공 · 0건' :
+            ({NOT_COLLECTED:'미수집', DATA_WITHOUT_HISTORY:'데이터 있음 · 이력 없음'})[item.status] || statuses[item.status] || item.status;
+          for (const value of [item.regionCode,item.month.slice(0,4)+'-'+item.month.slice(4),item.tradeCount.toLocaleString(),label,item.lastSucceededAt ? item.lastSucceededAt.replace('T',' ') : '확인 불가']) {
+            const cell = document.createElement('td'); cell.textContent = value; row.append(cell);
+          }
+          const cell = document.createElement('td'); const button = document.createElement('button');
+          button.className = 'secondary'; button.textContent = '수집 준비';
+          button.disabled = item.status === 'RUNNING'; button.dataset.running = String(item.status === 'RUNNING');
+          button.addEventListener('click', () => {
+            const form = $('collect-form');
+            if (form.elements.regionCode.value !== item.regionCode) { form.elements.province.value = ''; form.elements.district.value = ''; }
+            form.elements.regionCode.value = item.regionCode; form.elements.month.value = item.month.slice(0,4)+'-'+item.month.slice(4);
+            form.scrollIntoView({behavior:'smooth',block:'center'}); form.elements.province.focus();
+            message('공식 목록 기준 시도·시군구를 확인한 뒤 수집 요청을 눌러주세요.');
+          });
+          cell.append(button); row.append(cell); $('coverage-rows').append(row);
+        }
+        $('coverage-message').textContent = params.regionCode + ' · ' + result.length + '개월 · 저장 ' + sum.toLocaleString() + '건 (조회 시점 기준)';
+        message('데이터 현황을 조회했습니다. 수집 후 다시 조회하면 갱신됩니다.');
+      } catch(e) { $('coverage-message').textContent = '조회에 실패했습니다. 입력값과 연결 상태를 확인하세요.'; throw e; }
+    });
+  });
   $('login-form').addEventListener('submit', event => { event.preventDefault(); run(async () => { token = $('token').value; $('token').value = ''; await refresh(); message('연결됐습니다.'); }); });
   $('logout').addEventListener('click', () => { disconnect(); message('연결을 해제했습니다.'); });
   $('refresh').addEventListener('click', () => run(async () => { await refresh(); message('최근 이력을 갱신했습니다.'); }));
   $('status').addEventListener('change', render);
   $('collect-form').addEventListener('submit', event => { event.preventDefault(); const data = Object.fromEntries(new FormData(event.target)); data.month = data.month.replace('-',''); for (const key of Object.keys(data)) data[key] = data[key].trim(); mutate('', data, data.province + ' ' + data.district + ' ' + data.month + ' 거래를 수집할까요?'); });
-  const now = new Date(); document.querySelector('[name="month"]').max = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+  const now = new Date(); document.querySelectorAll('input[type="month"]').forEach(input => input.max = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0'));
   window.addEventListener('pagehide', disconnect);
 })();

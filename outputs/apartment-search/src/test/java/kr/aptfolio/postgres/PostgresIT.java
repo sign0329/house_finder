@@ -45,6 +45,7 @@ class PostgresIT {
  @Autowired MolitStore store;
  @Autowired kr.aptfolio.collection.jobs.CollectionJobs jobs;
  @Autowired SearchService search;
+ @Autowired kr.aptfolio.collection.jobs.CollectionCoverage coverage;
  @Autowired MockMvc mvc;
  static final YearMonth MONTH=YearMonth.of(2026,9);
  @BeforeEach void resetOnlyContainerData() {
@@ -56,6 +57,16 @@ class PostgresIT {
   return new MolitXml.Item(name,"서울 종로구 테스트동 1",new BigDecimal("84.9512"),7,2010,date,price,cancelled);
  }
  private static MolitXml.Item item(String name) {return item(name,82500,LocalDate.of(2026,9,15),false);}
+ @Test void coverageAggregatesPostgresRowsAndKeepsLastSuccessfulTimestamp() {
+  var region=kr.aptfolio.collection.molit.MolitRegion.JONGNO;
+  jobs.complete(jobs.start(region,MONTH),List.of(item("거래")));
+  var failed=jobs.start(region,MONTH);jobs.fail(failed,"FETCH_FAILED");
+  var rows=coverage.list("11110","202608","202610");
+  assertEquals(3,rows.size());assertEquals("NOT_COLLECTED",rows.get(0).status());
+  assertEquals(1L,rows.get(1).tradeCount());assertEquals("FAILED",rows.get(1).status());
+  assertNotNull(rows.get(1).lastSucceededAt());assertEquals(failed,rows.get(1).jobId());
+  assertEquals("NOT_COLLECTED",rows.get(2).status());
+ }
  @Test void upgradesExistingJongnoRowsWithoutChangingIdentity() {
   var config=org.flywaydb.core.Flyway.configure().dataSource(postgres.getJdbcUrl(),postgres.getUsername(),postgres.getPassword()).schemas("upgrade_test").defaultSchema("upgrade_test");
   config.target("3").load().migrate();
