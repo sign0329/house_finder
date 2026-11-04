@@ -29,6 +29,7 @@ public class CollectionJobApi {
  private void configured(){if(key.isBlank())throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,"수집 인증키 설정이 필요합니다.");}
  public record Request(String regionCode,String province,String district,String month){}
  @GetMapping public List<CollectionJobs.Job> list(@RequestHeader(value="X-Collection-Token",defaultValue="") String auth,@RequestParam(defaultValue="20") int limit){authorize(auth);jobs.recover();return jobs.list(limit);}
+ @GetMapping("/failures") public List<CollectionJobs.Failure> failures(@RequestHeader(value="X-Collection-Token",defaultValue="") String auth,@RequestParam(defaultValue="100") int limit){authorize(auth);jobs.recover();return jobs.failures(limit);}
  @GetMapping("/coverage") public List<CollectionCoverage.Month> coverage(@RequestHeader(value="X-Collection-Token",defaultValue="") String auth,@RequestParam String regionCode,@RequestParam String from,@RequestParam String to){authorize(auth);jobs.recover();return coverage.list(regionCode,from,to);}
  @GetMapping("/{id}") public CollectionJobs.Job get(@RequestHeader(value="X-Collection-Token",defaultValue="") String auth,@PathVariable String id){authorize(auth);jobs.recover();return jobs.get(id);}
  @PostMapping public ResponseEntity<Map<String,String>> start(@RequestHeader(value="X-Collection-Token",defaultValue="") String auth,@RequestBody Request request){
