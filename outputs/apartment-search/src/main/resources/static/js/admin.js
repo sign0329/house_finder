@@ -4,11 +4,11 @@
   const endpoint = '/api/admin/collection-jobs';
   const statuses = {RUNNING:'실행 중', SUCCEEDED:'성공', FAILED:'실패', INTERRUPTED:'중단'};
   const failures = {FETCH_FAILED:'공공 API 호출 실패', STORE_FAILED:'저장 실패', EXECUTOR_BUSY:'다른 수집 실행 중', LEASE_EXPIRED:'작업 유효 시간 만료'};
-  let jobs = [], failedJobs = [], busy = false, generation = 0;
+  let token = '', jobs = [], failedJobs = [], busy = false, generation = 0;
   function message(text, error = false) { $('message').textContent = text; $('message').className = error ? 'error' : ''; }
   function disconnect() {
-    generation++; jobs = []; failedJobs = []; $('failure-rows').replaceChildren(); $('failure-summary').textContent = '';  $('jobs').replaceChildren(); $('coverage-rows').replaceChildren(); $('coverage-message').textContent = '조회할 지역과 기간을 입력하세요.';
-    $('workspace').hidden = true;
+    generation++; token = ''; jobs = []; failedJobs = []; $('failure-rows').replaceChildren(); $('failure-summary').textContent = ''; $('token').value = ''; $('jobs').replaceChildren(); $('coverage-rows').replaceChildren(); $('coverage-message').textContent = '조회할 지역과 기간을 입력하세요.';
+    $('workspace').hidden = true; $('login-panel').hidden = false;
   }
   async function request(path = '', body) {
     const response = await fetch(endpoint + path, {method:body === undefined ? 'GET' : 'POST', cache:'no-store', credentials:'same-origin',
@@ -76,7 +76,7 @@
     const current = generation;
     const [result, failureResult] = await Promise.all([request('?limit=100'),request('/failures?limit=100')]);
     if (current !== generation) return;
-    jobs = result; failedJobs = failureResult; render(); renderFailures(); $('workspace').hidden = false;
+    jobs = result; failedJobs = failureResult; render(); renderFailures(); $('workspace').hidden = false; $('login-panel').hidden = true;
   }
   async function run(action) {
     if (busy) return; busy = true;
