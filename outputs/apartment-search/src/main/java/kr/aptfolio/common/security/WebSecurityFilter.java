@@ -52,9 +52,9 @@ public class WebSecurityFilter extends OncePerRequestFilter {
   res.setHeader("Content-Security-Policy","default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");
   if(req.isSecure())res.setHeader("Strict-Transport-Security","max-age=31536000");
   String path=req.getRequestURI();
-  if(path.equals("/admin/login")&&req.getMethod().equals("POST")&&!allowLogin(req.getRemoteAddr(),System.currentTimeMillis())) {
+  if((path.equals("/admin/login")||path.equals("/login")||path.equals("/signup"))&&req.getMethod().equals("POST")&&!allowLogin(req.getRemoteAddr(),System.currentTimeMillis())) {
    res.setStatus(429);res.setHeader("Retry-After","60");res.setHeader("Cache-Control","no-store");
-   res.setContentType("text/plain;charset=UTF-8");res.getWriter().write("로그인 요청이 많습니다. 1분 후 다시 시도하세요.");return;
+   res.setContentType("text/plain;charset=UTF-8");res.getWriter().write("인증 요청이 많습니다. 1분 후 다시 시도하세요.");return;
   }
   boolean search=path.equals("/")||path.equals("/api/trades")||path.startsWith("/trades/");
   if(search && !allow(req.getRemoteAddr(),System.currentTimeMillis())) {

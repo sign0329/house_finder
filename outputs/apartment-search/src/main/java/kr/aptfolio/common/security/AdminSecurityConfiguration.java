@@ -34,8 +34,8 @@ public class AdminSecurityConfiguration {
    .authorizeHttpRequests(a -> a.anyRequest().permitAll()).build();
  }
  @Bean @Order(2) @ConditionalOnProperty(name="collection.api.enabled",havingValue="true")
- SecurityFilterChain adminSession(HttpSecurity http) throws Exception {
-  return http.securityMatcher("/admin", "/admin/**", "/api/admin/**")
+ SecurityFilterChain adminSession(HttpSecurity http,@org.springframework.beans.factory.annotation.Qualifier("adminUsers") UserDetailsService admins,PasswordEncoder encoder) throws Exception {
+  return http.authenticationManager(manager(admins,encoder)).securityMatcher("/admin", "/admin/**", "/api/admin/**")
    .authorizeHttpRequests(a -> a.requestMatchers("/admin/login").permitAll().anyRequest().hasRole("ADMIN"))
    .formLogin(f -> f.loginPage("/admin/login").loginProcessingUrl("/admin/login")
     .defaultSuccessUrl("/admin",true).failureUrl("/admin/login?error").permitAll())
@@ -47,7 +47,17 @@ public class AdminSecurityConfiguration {
      else new LoginUrlAuthenticationEntryPoint("/admin/login").commence(request,response,exception);
    })).build();
  }
- @Bean @Order(3) SecurityFilterChain publicPages(HttpSecurity http) throws Exception {
-  return http.authorizeHttpRequests(a -> a.anyRequest().permitAll()).csrf(c -> c.disable()).build();
+ private static org.springframework.security.authentication.AuthenticationManager manager(UserDetailsService users,PasswordEncoder encoder) {
+  var provider=new org.springframework.security.authentication.dao.DaoAuthenticationProvider(users);
+  provider.setPasswordEncoder(encoder);
+  return new org.springframework.security.authentication.ProviderManager(provider);
+ }
+ @Bean @Order(3) SecurityFilterChain publicPages(HttpSecurity http,kr.aptfolio.account.UserAccounts users,PasswordEncoder encoder) throws Exception {
+  return http.authenticationManager(manager(users::loadUserByUsername,encoder))
+   .authorizeHttpRequests(a -> a.requestMatchers("/account", "/account/**").hasRole("USER").anyRequest().permitAll())
+   .formLogin(f -> f.loginPage("/login").loginProcessingUrl("/login").defaultSuccessUrl("/account",true).failureUrl("/login?error").permitAll())
+   .logout(l -> l.logoutUrl("/logout").logoutSuccessUrl("/login?logout").invalidateHttpSession(true).deleteCookies("JSESSIONID"))
+   .sessionManagement(s -> s.sessionFixation(f -> f.changeSessionId()))
+   .requestCache(c -> c.disable()).build();
  }
 }

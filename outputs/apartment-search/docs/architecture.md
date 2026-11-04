@@ -76,3 +76,7 @@ collection.jobs는 V6 collection_job에 지역·월별 시도 이력을 저장�
 ## 관리자 인증
 
 common.security의 AdminSecurityConfiguration이 관리자 화면/세션 API, 선택적인 자동화 토큰 API, 공개 페이지의 체인을 분리한다. 관리자 계정은 BCrypt 해시 환경 설정으로 구성하고 Spring Security 세션·CSRF·로그아웃을 사용한다. 활성화/운영 제약은 [관리자 로그인](admin-login.md)을 따른다.
+
+## 사용자 계정
+
+account 패키지의 UserAccounts/AccountController가 회원가입·로그인용 계정 조회와 내 정보 화면을 담당한다. V7 user_account에 계정을 저장하고 사용자와 관리자 로그인에 각각 별도의 AuthenticationManager를 지정한다. 상세 범위와 운영 제약은 [사용자 로그인](user-login.md)을 따른다.
