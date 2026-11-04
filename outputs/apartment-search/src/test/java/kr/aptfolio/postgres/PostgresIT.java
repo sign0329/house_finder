@@ -57,6 +57,18 @@ class PostgresIT {
   return new MolitXml.Item(name,"서울 종로구 테스트동 1",new BigDecimal("84.9512"),7,2010,date,price,cancelled);
  }
  private static MolitXml.Item item(String name) {return item(name,82500,LocalDate.of(2026,9,15),false);}
+ @Test void concurrentUserSignupPersistsExactlyOneHashedAccount() throws Exception {
+  var users=new kr.aptfolio.account.UserAccounts(new org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate(db));
+  var gate=new CountDownLatch(1);
+  try(var pool=Executors.newFixedThreadPool(2)) {
+   java.util.concurrent.Callable<Boolean> signup=()->{gate.await();try{users.register("pg_user","테스트 사용자","postgres-password-test","postgres-password-test");return true;}catch(org.springframework.dao.DuplicateKeyException e){return false;}};
+   var a=pool.submit(signup);var b=pool.submit(signup);gate.countDown();assertNotEquals(a.get(10,TimeUnit.SECONDS),b.get(10,TimeUnit.SECONDS));
+  }
+  assertEquals(1,db.queryForObject("select count(*) from user_account where username='pg_user'",Integer.class));
+  var reloaded=new kr.aptfolio.account.UserAccounts(new org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate(db)).loadUserByUsername("pg_user");
+  assertTrue(new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder().matches("postgres-password-test",reloaded.getPassword()));
+  assertEquals("ROLE_USER",reloaded.getAuthorities().iterator().next().getAuthority());
+ }
  @Test void failureListOnPostgresExcludesSuccessAndDisablesStaleRetry() {
   var region=kr.aptfolio.collection.molit.MolitRegion.JONGNO;
   var failed=jobs.start(region,MONTH);jobs.fail(failed,"EXECUTOR_BUSY");
@@ -124,7 +136,7 @@ class PostgresIT {
  }
  @Test void appliesAllMigrationsOnPostgres17() {
   assertTrue(db.queryForObject("select version()",String.class).startsWith("PostgreSQL 17."));
-  assertEquals(6,db.queryForObject("select count(*) from flyway_schema_history where success=true and type='SQL'",Integer.class));
+  assertEquals(7,db.queryForObject("select count(*) from flyway_schema_history where success=true and type='SQL'",Integer.class));
   assertEquals(4,db.queryForObject("select numeric_scale from information_schema.columns where table_schema='public' and table_name='trade' and column_name='area'",Integer.class));
   assertEquals(1,db.queryForObject("select count(*) from pg_indexes where schemaname='public' and indexname='idx_trade_source_key'",Integer.class));
  }
