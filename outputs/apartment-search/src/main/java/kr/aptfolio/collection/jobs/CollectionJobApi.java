@@ -22,10 +22,13 @@ public class CollectionJobApi {
  private final MolitClient client;
  private final ThreadPoolExecutor worker=new ThreadPoolExecutor(1,1,0,TimeUnit.SECONDS,new SynchronousQueue<>(),r->{Thread t=new Thread(r,"collection-worker");t.setDaemon(true);return t;},new ThreadPoolExecutor.AbortPolicy());
  public CollectionJobApi(CollectionJobs jobs,CollectionCoverage coverage,MolitClient client,@Value("${COLLECTION_ADMIN_TOKEN:}") String token,@Value("${MOLIT_SERVICE_KEY:}") String key){
-  if(token.isBlank()||token.length()<32)throw new IllegalArgumentException("수집 API에는 32자 이상의 관리 토큰이 필요합니다.");
+  if(!token.isEmpty()&&(token.isBlank()||token.length()<32))throw new IllegalArgumentException("수집 API에는 32자 이상의 관리 토큰이 필요합니다.");
   this.jobs=jobs;this.coverage=coverage;this.client=client;this.token=token;this.key=key;
  }
- private void authorize(String supplied){if(!MessageDigest.isEqual(token.getBytes(StandardCharsets.UTF_8),supplied.getBytes(StandardCharsets.UTF_8)))throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);}
+ private void authorize(String supplied){
+  var auth=org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+  if(auth!=null&&auth.isAuthenticated()&&auth.getAuthorities().stream().anyMatch(a->a.getAuthority().equals("ROLE_ADMIN")))return;
+  if(token.isEmpty()||!MessageDigest.isEqual(token.getBytes(StandardCharsets.UTF_8),supplied.getBytes(StandardCharsets.UTF_8)))throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);}
  private void configured(){if(key.isBlank())throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,"수집 인증키 설정이 필요합니다.");}
  public record Request(String regionCode,String province,String district,String month){}
  @GetMapping public List<CollectionJobs.Job> list(@RequestHeader(value="X-Collection-Token",defaultValue="") String auth,@RequestParam(defaultValue="20") int limit){authorize(auth);jobs.recover();return jobs.list(limit);}

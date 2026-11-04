@@ -4,19 +4,19 @@
   const endpoint = '/api/admin/collection-jobs';
   const statuses = {RUNNING:'실행 중', SUCCEEDED:'성공', FAILED:'실패', INTERRUPTED:'중단'};
   const failures = {FETCH_FAILED:'공공 API 호출 실패', STORE_FAILED:'저장 실패', EXECUTOR_BUSY:'다른 수집 실행 중', LEASE_EXPIRED:'작업 유효 시간 만료'};
-  let token = '', jobs = [], failedJobs = [], busy = false, generation = 0;
+  let jobs = [], failedJobs = [], busy = false, generation = 0;
   function message(text, error = false) { $('message').textContent = text; $('message').className = error ? 'error' : ''; }
   function disconnect() {
-    generation++; token = ''; jobs = []; failedJobs = []; $('failure-rows').replaceChildren(); $('failure-summary').textContent = ''; $('token').value = ''; $('jobs').replaceChildren(); $('coverage-rows').replaceChildren(); $('coverage-message').textContent = '조회할 지역과 기간을 입력하세요.';
-    $('workspace').hidden = true; $('login-panel').hidden = false;
+    generation++; jobs = []; failedJobs = []; $('failure-rows').replaceChildren(); $('failure-summary').textContent = '';  $('jobs').replaceChildren(); $('coverage-rows').replaceChildren(); $('coverage-message').textContent = '조회할 지역과 기간을 입력하세요.';
+    $('workspace').hidden = true;
   }
   async function request(path = '', body) {
-    const response = await fetch(endpoint + path, {method:body === undefined ? 'GET' : 'POST', cache:'no-store', credentials:'omit',
-      headers:{'X-Collection-Token':token, ...(body === undefined ? {} : {'Content-Type':'application/json'})},
+    const response = await fetch(endpoint + path, {method:body === undefined ? 'GET' : 'POST', cache:'no-store', credentials:'same-origin',
+      headers:{...(body === undefined ? {} : {'Content-Type':'application/json', [document.querySelector('meta[name="csrf-header"]').content]:document.querySelector('meta[name="csrf-token"]').content})},
       ...(body === undefined ? {} : {body:JSON.stringify(body)})});
     if (!response.ok) {
-      if (response.status === 401) disconnect();
-      throw new Error(({400:'입력값을 확인하세요. 계약월은 현재 월까지 가능합니다.',401:'관리 토큰이 올바르지 않습니다.',404:'관리 기능이 비활성화됐거나 작업이 없습니다.',409:'실행 중이거나 최신 시도가 아닌 작업입니다. 새로고침 후 확인하세요.',503:'서버의 공공 API 인증키 설정이 필요합니다.'})[response.status] || '요청에 실패했습니다. 잠시 후 다시 시도하세요.');
+      if (response.status === 401) { disconnect(); window.location.assign('/admin/login'); }
+      throw new Error(({400:'입력값을 확인하세요. 계약월은 현재 월까지 가능합니다.',401:'로그인이 만료됐습니다.',403:'요청 인증이 만료됐습니다. 페이지를 새로고침한 뒤 다시 시도하세요.',404:'관리 기능이 비활성화됐거나 작업이 없습니다.',409:'실행 중이거나 최신 시도가 아닌 작업입니다. 새로고침 후 확인하세요.',503:'서버의 공공 API 인증키 설정이 필요합니다.'})[response.status] || '요청에 실패했습니다. 잠시 후 다시 시도하세요.');
     }
     return response.json();
   }
@@ -76,7 +76,7 @@
     const current = generation;
     const [result, failureResult] = await Promise.all([request('?limit=100'),request('/failures?limit=100')]);
     if (current !== generation) return;
-    jobs = result; failedJobs = failureResult; render(); renderFailures(); $('workspace').hidden = false; $('login-panel').hidden = true;
+    jobs = result; failedJobs = failureResult; render(); renderFailures(); $('workspace').hidden = false;
   }
   async function run(action) {
     if (busy) return; busy = true;
@@ -125,11 +125,11 @@
       } catch(e) { $('coverage-message').textContent = '조회에 실패했습니다. 입력값과 연결 상태를 확인하세요.'; throw e; }
     });
   });
-  $('login-form').addEventListener('submit', event => { event.preventDefault(); run(async () => { token = $('token').value; $('token').value = ''; await refresh(); message('연결됐습니다.'); }); });
-  $('logout').addEventListener('click', () => { disconnect(); message('연결을 해제했습니다.'); });
   $('refresh').addEventListener('click', () => run(async () => { await refresh(); message('최근 이력을 갱신했습니다.'); }));
   $('status').addEventListener('change', render);
   $('collect-form').addEventListener('submit', event => { event.preventDefault(); const data = Object.fromEntries(new FormData(event.target)); data.month = data.month.replace('-',''); for (const key of Object.keys(data)) data[key] = data[key].trim(); mutate('', data, data.province + ' ' + data.district + ' ' + data.month + ' 거래를 수집할까요?'); });
   const now = new Date(); document.querySelectorAll('input[type="month"]').forEach(input => input.max = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0'));
   window.addEventListener('pagehide', disconnect);
+  window.addEventListener('pageshow', event => { if(event.persisted) window.location.reload(); });
+  run(refresh);
 })();

@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-<html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="csrf-token" th:content="${_csrf.token}"><meta name="csrf-header" th:content="${_csrf.headerName}">
 <title>수집 관리 · 집결</title><link rel="stylesheet" href="/css/admin.css"><script defer src="/js/admin.js"></script></head>
 <body><header><a class="brand" href="/">집결 <span>ADMIN</span></a><a href="/">실거래가 탐색 ↗</a></header>
 <main><div class="heading"><p class="eyebrow">DATA OPERATIONS</p><h1>수집 관리</h1><p>지역별 거래 수집 현황을 확인하고 실패한 작업을 다시 실행하세요.</p></div>
-<section id="login-panel" class="panel"><h2>관리자 연결</h2><p>관리 토큰을 입력하세요. 토큰은 이 탭의 메모리에서만 사용하며 새로고침하면 지워집니다.</p>
-<form id="login-form"><label for="token">관리 토큰</label><div class="inline"><input id="token" type="password" required minlength="32" autocomplete="off" spellcheck="false"><button>연결</button></div></form></section>
 <p id="message" role="status" aria-live="polite"></p>
-<div id="workspace" hidden><div class="toolbar"><span>관리자 연결됨 · 최근 100개 작업 기준</span><div><button id="refresh" class="secondary">새로고침</button> <button id="logout" class="secondary">연결 해제</button></div></div>
+<div id="workspace"><div class="toolbar"><span>관리자 로그인됨 · 최근 100개 작업 기준</span><div><button id="refresh" class="secondary">새로고침</button> <form class="logout-form" method="post" th:action="@{/admin/logout}"><button class="secondary">로그아웃</button></form></div></div>
 <div class="stats"><article><span>조회된 작업</span><strong id="count-all">0</strong></article><article><span>실행 중</span><strong id="count-running">0</strong></article><article><span>성공</span><strong id="count-success">0</strong></article><article><span>실패·중단</span><strong id="count-failed">0</strong></article></div>
 <section class="panel"><div class="toolbar"><h2>실패 사례 모음</h2><label>실패 유형 <select id="failure-type"><option value="">전체</option><option value="FETCH_FAILED">공공 API 호출 실패</option><option value="STORE_FAILED">저장 실패</option><option value="EXECUTOR_BUSY">수집기 사용 중</option><option value="LEASE_EXPIRED">작업 시간 만료</option></select></label></div>
 <p>최근 실패·중단 이력 최대 100개입니다. 이후 재시도에 성공한 과거 실패도 기록으로 남습니다.</p><p id="failure-summary" role="status"></p>

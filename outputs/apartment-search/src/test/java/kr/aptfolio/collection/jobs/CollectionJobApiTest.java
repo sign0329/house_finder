@@ -14,12 +14,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(properties={"collection.api.enabled=true","COLLECTION_ADMIN_TOKEN=01234567890123456789012345678901","MOLIT_SERVICE_KEY=fixture-only","spring.datasource.url=jdbc:h2:mem:job-api;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE"})
 @AutoConfigureMockMvc
 class CollectionJobApiTest {
+ @org.springframework.test.context.DynamicPropertySource static void adminCredentials(org.springframework.test.context.DynamicPropertyRegistry registry) {
+  registry.add("ADMIN_USERNAME",()->"test-admin");
+  registry.add("ADMIN_PASSWORD_HASH",()->new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder(10).encode("fixture-password"));
+ }
  @Autowired MockMvc mvc; @Autowired JdbcTemplate db; @Autowired CollectionJobs jobs;
  @MockitoBean MolitClient client;
  static final String PATH="/api/admin/collection-jobs",TOKEN="01234567890123456789012345678901";
  @BeforeEach void reset(){db.update("delete from collection_job");db.update("delete from trade");}
  @Test void adminPageRendersOnlyShellWithoutCredentialsOrJobData() throws Exception {
-  mvc.perform(get("/admin")).andExpect(status().isOk())
+  mvc.perform(get("/admin").with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user("test-admin").roles("ADMIN"))).andExpect(status().isOk())
    .andExpect(view().name("admin"))
    .andExpect(header().string("Cache-Control","no-store"))
    .andExpect(content().string(org.hamcrest.Matchers.containsString("수집 관리")))

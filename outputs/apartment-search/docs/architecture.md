@@ -72,3 +72,7 @@ kr.aptfolio
 ## 수집 작업 이력
 
 collection.jobs는 V6 collection_job에 지역·월별 시도 이력을 저장한다. 기존 importer와 선택적으로 활성화하는 관리 API가 같은 작업 서비스에 연결된다. 거래 스냅샷과 성공 기록은 동일 트랜잭션으로 처리하며, 실패 기록은 별도 트랜잭션이다. 기존 전역 수집 잠금으로 중복 claim을 직렬화하고 30분 유효 시간과 완료 전 상태 확인으로 만료 작업의 늦은 저장을 차단한다. 상세 API·복구 규칙은 [수집 이력 안내](collection-jobs.md)를 따른다.
+
+## 관리자 인증
+
+common.security의 AdminSecurityConfiguration이 관리자 화면/세션 API, 선택적인 자동화 토큰 API, 공개 페이지의 체인을 분리한다. 관리자 계정은 BCrypt 해시 환경 설정으로 구성하고 Spring Security 세션·CSRF·로그아웃을 사용한다. 활성화/운영 제약은 [관리자 로그인](admin-login.md)을 따른다.
