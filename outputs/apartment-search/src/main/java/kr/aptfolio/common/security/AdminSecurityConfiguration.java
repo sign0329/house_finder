@@ -54,10 +54,14 @@ public class AdminSecurityConfiguration {
  }
  @Bean @Order(3) SecurityFilterChain publicPages(HttpSecurity http,kr.aptfolio.account.UserAccounts users,PasswordEncoder encoder) throws Exception {
   return http.authenticationManager(manager(users::loadUserByUsername,encoder))
-   .authorizeHttpRequests(a -> a.requestMatchers("/account", "/account/**").hasRole("USER").anyRequest().permitAll())
+   .authorizeHttpRequests(a -> a.requestMatchers("/account", "/account/**", "/saved", "/api/account/**").hasRole("USER").anyRequest().permitAll())
    .formLogin(f -> f.loginPage("/login").loginProcessingUrl("/login").defaultSuccessUrl("/account",true).failureUrl("/login?error").permitAll())
    .logout(l -> l.logoutUrl("/logout").logoutSuccessUrl("/login?logout").invalidateHttpSession(true).deleteCookies("JSESSIONID"))
    .sessionManagement(s -> s.sessionFixation(f -> f.changeSessionId()))
-   .requestCache(c -> c.disable()).build();
+   .requestCache(c -> c.disable())
+   .exceptionHandling(e -> e.authenticationEntryPoint((request,response,exception) -> {
+    if(request.getRequestURI().startsWith("/api/"))response.sendError(401);
+    else new LoginUrlAuthenticationEntryPoint("/login").commence(request,response,exception);
+   })).build();
  }
 }
