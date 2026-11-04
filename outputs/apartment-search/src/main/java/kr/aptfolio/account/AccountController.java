@@ -22,6 +22,10 @@ public class AccountController {
   // Password fields deliberately never enter the model.
   model.addAttribute("username",username);model.addAttribute("nickname",nickname);return "signup";
  }
+ @GetMapping("/api/account/session") @ResponseBody
+ public java.util.Map<String,String> session(Principal principal,HttpServletResponse response) {
+  response.setHeader("Cache-Control","no-store");return java.util.Map.of("username",principal.getName());
+ }
  @GetMapping("/account") public String account(Principal principal,Model model) {
   model.addAttribute("profile",users.profile(principal.getName()));return "account";
  }
