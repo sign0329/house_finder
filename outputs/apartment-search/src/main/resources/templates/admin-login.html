@@ -1,0 +1,8 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>관리자 로그인 · 집결</title><link rel="stylesheet" href="/css/admin.css"></head>
+<body><header><a class="brand" href="/">집결 <span>ADMIN</span></a><a href="/">실거래가 탐색 ↗</a></header>
+<main class="login-layout"><p class="eyebrow">DATA OPERATIONS</p><h1>관리자 로그인</h1><p>관리자 계정으로 수집 현황을 확인하고 작업을 관리하세요.</p>
+<section class="panel"><p role="alert" th:if="${param.error}" class="login-error">아이디 또는 비밀번호를 확인하세요.</p><p role="status" th:if="${param.logout}">로그아웃했습니다.</p>
+<form method="post" th:action="@{/admin/login}"><label for="username">아이디</label><input id="username" name="username" autocomplete="username" required maxlength="64" autofocus>
+<label for="password">비밀번호</label><input id="password" name="password" type="password" autocomplete="current-password" required maxlength="128"><button>로그인</button></form>
+<p class="hint">30분 동안 요청이 없으면 로그인이 만료됩니다.</p></section></main></body></html>

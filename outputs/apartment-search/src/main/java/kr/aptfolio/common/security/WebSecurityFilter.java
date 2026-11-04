@@ -21,6 +21,9 @@ public class WebSecurityFilter extends OncePerRequestFilter {
  private final Map<String,Integer> counts = new HashMap<>();
  private long window = -1;
  private int total;
+ private final Map<String,Integer> loginCounts=new HashMap<>();
+ private long loginWindow=-1;
+ private int loginTotal;
  public WebSecurityFilter(@Value("${app.security.requests-per-minute:120}") int perClient,
    @Value("${app.security.global-requests-per-minute:6000}") int globalLimit) {
   if(perClient < 1 || globalLimit < 1) throw new IllegalArgumentException("Request limits must be positive");
@@ -33,6 +36,13 @@ public class WebSecurityFilter extends OncePerRequestFilter {
   if(total>=globalLimit || count>=perClient || (!counts.containsKey(client)&&counts.size()>=10000))return false;
   counts.put(client,count+1); total++; return true;
  }
+ synchronized boolean allowLogin(String client,long now) {
+  long current=now/60000;
+  if(current!=loginWindow){loginCounts.clear();loginTotal=0;loginWindow=current;}
+  int count=loginCounts.getOrDefault(client,0);
+  if(count>=10||loginTotal>=1000)return false;
+  loginCounts.put(client,count+1);loginTotal++;return true;
+ }
  @Override protected void doFilterInternal(HttpServletRequest req,HttpServletResponse res,FilterChain chain)
  throws IOException,ServletException {
   res.setHeader("X-Content-Type-Options","nosniff");
@@ -42,6 +52,10 @@ public class WebSecurityFilter extends OncePerRequestFilter {
   res.setHeader("Content-Security-Policy","default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");
   if(req.isSecure())res.setHeader("Strict-Transport-Security","max-age=31536000");
   String path=req.getRequestURI();
+  if(path.equals("/admin/login")&&req.getMethod().equals("POST")&&!allowLogin(req.getRemoteAddr(),System.currentTimeMillis())) {
+   res.setStatus(429);res.setHeader("Retry-After","60");res.setHeader("Cache-Control","no-store");
+   res.setContentType("text/plain;charset=UTF-8");res.getWriter().write("로그인 요청이 많습니다. 1분 후 다시 시도하세요.");return;
+  }
   boolean search=path.equals("/")||path.equals("/api/trades")||path.startsWith("/trades/");
   if(search && !allow(req.getRemoteAddr(),System.currentTimeMillis())) {
    res.setStatus(429);res.setHeader("Retry-After","60");res.setHeader("Cache-Control","no-store");
