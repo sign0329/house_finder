@@ -80,3 +80,7 @@ common.security의 AdminSecurityConfiguration이 관리자 화면/세션 API, �
 ## 사용자 계정
 
 account 패키지의 UserAccounts/AccountController가 회원가입·로그인용 계정 조회와 내 정보 화면을 담당한다. V7 user_account에 계정을 저장하고 사용자와 관리자 로그인에 각각 별도의 AuthenticationManager를 지정한다. 상세 범위와 운영 제약은 [사용자 로그인](user-login.md)을 따른다.
+
+## 관심 아파트 DB 저장
+
+bookmark 패키지가 세션 사용자 기준의 저장·조회·삭제를 담당한다. V8 user_bookmark에 아파트 식별 필드를 보존하고 사용자 행 잠금과 유일 제약으로 중복 저장을 방지한다. 거래 스냅샷 삭제와 독립적으로 유지하며 조회 시 현재 거래 링크를 구한다. [상세 정책](bookmarks.md)을 참고한다.
