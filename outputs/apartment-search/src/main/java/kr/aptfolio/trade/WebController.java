@@ -9,7 +9,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Controller
 public class WebController {
  private final SearchService service;
- public WebController(SearchService service){this.service=service;}
+ private final KakaoMapSettings maps;
+ public WebController(SearchService service,KakaoMapSettings maps){this.service=service;this.maps=maps;}
  @ModelAttribute void shared(Model m){m.addAttribute("dataNotice",service.dataNotice());m.addAttribute("regions",Provinces.all());}
  @GetMapping("/") String home(@RequestParam Map<String,String> params,Model m){
   var result=service.search(params);m.addAttribute("result",result);m.addAttribute("filters",params);m.addAttribute("selectedRegion",Provinces.canonical(params.getOrDefault("region","")));
@@ -20,6 +21,8 @@ public class WebController {
  @GetMapping("/api/trades") @ResponseBody SearchService.Results api(@RequestParam Map<String,String> params){return service.search(params);}
  @GetMapping("/trades/{id}") String detail(@PathVariable long id,Model m){
   var t=service.find(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
+  m.addAttribute("mapKey",maps.key());
+  m.addAttribute("mapSearchUrl","https://map.kakao.com/link/search/"+org.springframework.web.util.UriUtils.encodePathSegment(t.address(),java.nio.charset.StandardCharsets.UTF_8));
   var history=service.history(t);m.addAttribute("trade",t);m.addAttribute("history",history);
   m.addAttribute("chartMax",history.stream().mapToLong(Trade::price).max().orElse(1));return "detail";
  }

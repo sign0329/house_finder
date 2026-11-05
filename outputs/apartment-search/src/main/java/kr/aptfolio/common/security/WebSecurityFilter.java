@@ -16,6 +16,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 /** Bounded, per-process fixed-window limit. Forwarded client headers are never trusted. */
 @Component @Order(Ordered.HIGHEST_PRECEDENCE)
 public class WebSecurityFilter extends OncePerRequestFilter {
+ @org.springframework.beans.factory.annotation.Autowired
+ private kr.aptfolio.trade.KakaoMapSettings maps;
  private final int perClient;
  private final int globalLimit;
  private final Map<String,Integer> counts = new HashMap<>();
@@ -50,6 +52,8 @@ public class WebSecurityFilter extends OncePerRequestFilter {
   res.setHeader("Referrer-Policy","strict-origin-when-cross-origin");
   res.setHeader("Permissions-Policy","camera=(), microphone=(), geolocation=()");
   res.setHeader("Content-Security-Policy","default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");
+  if(maps!=null && maps.enabled() && req.getRequestURI().matches("/trades/[0-9]+"))
+   res.setHeader("Content-Security-Policy","default-src 'self'; script-src 'self' https://dapi.kakao.com https://t1.daumcdn.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://*.daumcdn.net https://*.kakaocdn.net; font-src 'self'; connect-src 'self' https://dapi.kakao.com; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");
   if(req.isSecure())res.setHeader("Strict-Transport-Security","max-age=31536000");
   String path=req.getRequestURI();
   if((path.equals("/admin/login")||path.equals("/login")||path.equals("/signup"))&&req.getMethod().equals("POST")&&!allowLogin(req.getRemoteAddr(),System.currentTimeMillis())) {
