@@ -45,6 +45,7 @@ class PostgresIT {
  @Autowired MolitStore store;
  @Autowired kr.aptfolio.collection.jobs.CollectionJobs jobs;
  @Autowired SearchService search;
+ @Autowired kr.aptfolio.bookmark.Bookmarks bookmarks;
  @Autowired kr.aptfolio.collection.jobs.CollectionCoverage coverage;
  @Autowired MockMvc mvc;
  static final YearMonth MONTH=YearMonth.of(2026,9);
@@ -57,6 +58,18 @@ class PostgresIT {
   return new MolitXml.Item(name,"서울 종로구 테스트동 1",new BigDecimal("84.9512"),7,2010,date,price,cancelled);
  }
  private static MolitXml.Item item(String name) {return item(name,82500,LocalDate.of(2026,9,15),false);}
+ @Test void concurrentBookmarksAreUniqueAndSurviveTradeRemoval() throws Exception {
+  db.update("insert into user_account(username,nickname,password_hash) values('pg_bookmark','검증','fixture')");
+  store.replace(MONTH,List.of(item("관심 단지")));long trade=db.queryForObject("select id from trade limit 1",Long.class);
+  var gate=new CountDownLatch(1);
+  try(var pool=Executors.newFixedThreadPool(2)) {
+   java.util.concurrent.Callable<Long> save=()->{gate.await();return bookmarks.save("pg_bookmark",trade);};
+   var a=pool.submit(save);var b=pool.submit(save);gate.countDown();assertEquals(a.get(10,TimeUnit.SECONDS),b.get(10,TimeUnit.SECONDS));
+  }
+  assertEquals(1,bookmarks.list("pg_bookmark").size());db.update("delete from trade");
+  assertNull(bookmarks.list("pg_bookmark").getFirst().tradeId());
+  store.replace(MONTH,List.of(item("관심 단지")));assertNotNull(bookmarks.list("pg_bookmark").getFirst().tradeId());
+ }
  @Test void concurrentUserSignupPersistsExactlyOneHashedAccount() throws Exception {
   var users=new kr.aptfolio.account.UserAccounts(new org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate(db));
   var gate=new CountDownLatch(1);
@@ -136,7 +149,7 @@ class PostgresIT {
  }
  @Test void appliesAllMigrationsOnPostgres17() {
   assertTrue(db.queryForObject("select version()",String.class).startsWith("PostgreSQL 17."));
-  assertEquals(7,db.queryForObject("select count(*) from flyway_schema_history where success=true and type='SQL'",Integer.class));
+  assertEquals(8,db.queryForObject("select count(*) from flyway_schema_history where success=true and type='SQL'",Integer.class));
   assertEquals(4,db.queryForObject("select numeric_scale from information_schema.columns where table_schema='public' and table_name='trade' and column_name='area'",Integer.class));
   assertEquals(1,db.queryForObject("select count(*) from pg_indexes where schemaname='public' and indexname='idx_trade_source_key'",Integer.class));
  }
