@@ -17,3 +17,7 @@ data/
 .DS_Store
 
 # Rules do not untrack files already committed. Do not stage existing IDE changes.
+
+# Local database backups (including repository-root backups)
+backups/
+*.dump
