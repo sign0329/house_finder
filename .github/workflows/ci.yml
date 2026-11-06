@@ -36,6 +36,8 @@ jobs:
           cache-dependency-path: outputs/apartment-search/pom.xml
       - name: Test collection resume orchestration
         run: python3 scripts/test_collect_nationwide.py
+      - name: Test map behavior without external API
+        run: node scripts/test-detail-map.cjs
       - name: Build and test without public API credentials
         run: sh ./mvnw -B -ntp -Ppostgres-it clean verify
       - name: Build and start container stack with an empty database
