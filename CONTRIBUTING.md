@@ -52,4 +52,4 @@ GitHub에서 작업 브랜치 → main PR을 만든다. PR 템플릿에 변경 �
 
 Actions는 읽기 권한으로 실행하며 외부 액션은 커밋 SHA로 고정한다. Jenkinsfile은 별도 준비 설정이고 GitHub 필수 검사는 GitHub Actions가 담당한다.
 
-프로젝트는 저장소 루트가 아닌 `outputs/apartment-search`에 있다. 상세 실행 방법은 [프로젝트 README](outputs/apartment-search/README.md)를 따른다. 최초 업로드 당시 포함된 work·IDE·ZIP 파일은 기존 이력에 남아 있으며, 루트 .gitignore가 기존 추적을 해제하지는 않는다. 새 PR에 개인 파일 변경을 포함하지 않는다.
+프로젝트는 저장소 루트가 아닌 `outputs/apartment-search`에 있다. 상세 실행 방법은 [프로젝트 README](outputs/apartment-search/README.md)를 따른다. 최초 업로드 당시 포함된 work·IDE·ZIP 파일은 기존 이력에 남아 있으며, 현재 브랜치에서는 해당 파일의 Git 추적을 해제했고 로컬 파일은 보존했다. 새 PR에 개인 파일 변경을 포함하지 않는다.

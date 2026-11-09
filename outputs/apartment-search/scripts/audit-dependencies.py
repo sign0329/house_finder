@@ -22,7 +22,7 @@ for name in names:
 req=urllib.request.Request('https://api.osv.dev/v1/querybatch',data=json.dumps({'queries':queries}).encode(),headers={'Content-Type':'application/json'})
 with urllib.request.urlopen(req,timeout=60) as r: results=json.load(r)['results']
 report={'packagesChecked':len(packages),'unmapped':missing,'findings':[dict(p,vulnerabilities=r.get('vulns',[])) for p,r in zip(packages,results) if r.get('vulns')]}
-(root/'docs/dependency-scan-2026-10-26.json').write_text(json.dumps(report,indent=2))
+(root/'docs/reports/dependency-scan-2026-10-26.json').write_text(json.dumps(report,indent=2))
 print(json.dumps(report,indent=2))
 
 if missing:raise SystemExit(2)
