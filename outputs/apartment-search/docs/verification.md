@@ -37,7 +37,7 @@
 | 패키징 JAR 실행 | HTTP 200, health UP | 127.0.0.1:8080 및 보안 헤더 확인 |
 | 구문 검사 | 통과 | JavaScript, mvnw |
 
-보안 테스트는 수정 전 3개 실패를 관측한 뒤 수정 후 통과를 확인했습니다. 테스트 수는 커버리지 비율을 의미하지 않습니다. [원본 의존성 조회 결과](dependency-scan-2026-10-26.json), [보완 상세](security-remediation-2026-10-26.md)를 참고하세요.
+보안 테스트는 수정 전 3개 실패를 관측한 뒤 수정 후 통과를 확인했습니다. 테스트 수는 커버리지 비율을 의미하지 않습니다. [원본 의존성 조회 결과](reports/dependency-scan-2026-10-26.json), [보완 상세](reports/security-remediation-2026-10-26.md)를 참고하세요.
 
 재현: 프로젝트 루트에서 `./mvnw verify`. 테스트 결과는 `target/surefire-reports/`에 생성됩니다. 의존성 조회는 README의 OSV 실행 안내를 따르세요.
 

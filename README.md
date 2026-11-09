@@ -123,3 +123,5 @@ AI 코딩 도구를 활용해 구현하고 테스트·실행 결과로 변경을
 [브랜치·PR·CI 작업 안내](CONTRIBUTING.md)를 따릅니다. 최신 구현·실행 안내는 [프로젝트 README](outputs/apartment-search/README.md)를 참고하세요.
 
 데모 자동 생성과 DEMO_DATA 설정은 제거했습니다. 실제 거래는 postgres 또는 molit 프로필로 조회합니다. 이전 demo 실행 설정은 local로 변경하세요. 테스트 fixture는 src/test에만 존재하며 배포 JAR에 포함하지 않습니다. 기존 DB 데이터는 자동 삭제하지 않습니다.
+
+[폴더 구조와 문서 안내](outputs/apartment-search/docs/README.md)

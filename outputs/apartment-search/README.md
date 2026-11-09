@@ -67,7 +67,7 @@ python3 scripts/audit-dependencies.py
 
 2026-10-26 API 연결 코드 추가 후 테스트 30개가 통과했습니다. 런타임 의존성 63개 조회에서 알려진 취약점 매칭은 0개였습니다. 이는 모든 취약점이 없다는 보장이 아닙니다. OSV 스크립트는 프로젝트 `.m2/repository`를 사용하므로 시스템 Maven을 사용하는 경우 `./mvnw -Dmaven.repo.local="$PWD/.m2/repository" package`로 먼저 빌드하세요.
 
-[검증 기록](docs/verification.md) · [보안 보완 결과](docs/security-remediation-2026-10-26.md)
+[검증 기록](docs/verification.md) · [보안 보완 결과](docs/reports/security-remediation-2026-10-26.md)
 
 ## 설계 개요
 
@@ -154,3 +154,5 @@ Caddy 자동 HTTPS, 앱·DB 포트 비공개, 로컬 환경변수 파일, DB 백
 수집 작업 DB 이력·관리 API·실패 재시도: [운영 안내](docs/collection-jobs.md). 기본 비활성화이며 전용 관리 토큰 설정이 필요합니다.
 
 - [아파트 상세 지도 설정 및 검증](docs/maps.md)
+
+[폴더 구조와 문서 안내](docs/README.md)
