@@ -1,5 +1,8 @@
 # 집결 | 공공데이터 기반 아파트 실거래가 조회 서비스
 
+<img width="930" height="568" alt="스크린샷 2026-11-09 14 51 55" src="https://github.com/user-attachments/assets/a5490ad9-62fc-4607-8b07-8c3cde62e78c" />
+
+
 > 백엔드 개발 포트폴리오 · 프로젝트 기술 보고서
 >
 > 작성 기준: 2026-11-09 · 개인 프로젝트 · Java / Spring Boot / PostgreSQL
