@@ -1,158 +1,89 @@
-# 집결 — 아파트 실거래가 검색
+# 집결 | 개발·실행 안내
 
-지역·가격·면적·계약 기간으로 아파트 거래를 검색하고, 거래 상세와 동일 면적의 가격 흐름을 확인하는 웹 프로젝트입니다.
+프로젝트 목적, 핵심 설계, 검증 근거와 운영 현황은 [저장소 소개 보고서](../../README.md)를 참고하세요. 이 문서는 실행과 개발에 필요한 절차를 정리합니다.
 
-**현재 단계: AWS HTTPS 공개 배포 완료(2026-10-29). 종로구 32건과 청주시 694건, 총 726건의 실제 거래를 조회할 수 있습니다. 자동 생성 데모 데이터는 제거했으며, 전국 전체 데이터 수집과 대용량 성능 검증은 완료되지 않았습니다.**
+## 1. 실행 전제
 
-🌐 **[배포 사이트 열기](https://3-107-167-57.sslip.io/)**
-
-청주 거래는 지역 `충북`, 검색어 `청주시`, 계약 기간 `2026-09-01 ~ 2026-09-30`으로 조회하세요. 무료 IP 기반 주소이므로 서버 중지·IP 변경 시 접속 주소나 운영 상태가 달라질 수 있습니다.
-
-공공데이터를 가져오려면 [IntelliJ에서 첫 수집 실행](docs/public-api.md)을 참고하세요. 종로구의 선택한 계약월을 별도 로컬 DB에 저장합니다.
-
-![집결 검색 화면 — 가상 거래 데이터](preview.jpg)
-
-## 구현한 기능
-
-- 지역, 단지명/시·군·구, 가격, 기간, 면적 조건 검색
-- 최근순·가격순 정렬, 검색 조건을 유지하는 12건 단위 페이지 이동
-- 거래 상세 및 동일 주소·단지·면적의 최근 최대 12건 비교
-- 브라우저 localStorage 기반 관심 저장
-- 잘못된 입력·없는 거래·빈 검색 결과 처리
-- 보안 헤더, 요청 횟수 제한, SQL 쿼리 시간 제한
-
-관심 저장은 계정 간 동기화를 지원하지 않습니다. 기본 local 프로필은 빈 메모리 DB로 시작하고 서버 재시작 시 초기화됩니다. 공공데이터용 molit 프로필은 파일 DB에 저장합니다.
-
-## 기술 구성
-
-| 영역 | 사용 기술 | 적용 상태 |
-| --- | --- | --- |
-| 서버 | Java 21, Spring Boot 4.0.9, Spring MVC | 구현 |
-| 화면 | Thymeleaf, CSS, JavaScript | 구현 |
-| 데이터 접근 | Spring JDBC, Flyway | 구현 |
-| 기본 실행 DB | H2 | 테스트·실행 확인 |
-| 개발 DB | PostgreSQL 17 | 실제 거래 32건 저장·조회, 통합 테스트 7개 통과 |
-| 테스트 | JUnit 5, MockMvc, Testcontainers | 기본 38개 + PostgreSQL 9개 통과 |
-| CI | GitHub Actions | PR·main의 Java 테스트 실행 확인 |
-| 컨테이너 | Docker, Compose | 앱·DB 실행, 실제 수집, 재시작 후 데이터 유지 확인 |
-| 별도 CI | Jenkinsfile | 설정 준비, 실행 미검증 |
-| 성능 실험 | k6 | 스크립트 준비, 측정 미실시 |
-
-## 빠른 실행
-
-macOS/Linux 셸, 패치된 JDK 21, curl, tar가 필요합니다. 최초 실행은 Maven과 의존성 다운로드를 위해 인터넷을 사용합니다.
+- Java 21, Maven 실행 환경. 최초 의존성 다운로드에는 인터넷 연결 필요
+- PostgreSQL 통합 테스트와 Docker 실행에는 Docker Desktop/Engine 필요
+- 저장소 루트에서 아래 프로젝트 디렉터리로 이동
 
 ```sh
-# 저장소를 내려받은 뒤 프로젝트 루트에서 실행
-# JDK 설치가 필요한 경우: Python 3.12+ 필요
+cd outputs/apartment-search
+```
+
+기본 실행은 빈 메모리 H2 DB입니다. 재시작하면 해당 환경의 데이터가 사라집니다. 실제 수집 데이터를 보려면 해당 PostgreSQL DB에 연결해야 합니다. API 키 없이도 빈 검색 화면과 테스트를 실행할 수 있습니다.
+
+## 2. 기본 개발 실행
+
+```sh
+# JDK가 없을 때만 실행: Python 3.12+ 필요
 python3 scripts/setup-java.py
-
-./mvnw -v
-./mvnw spring-boot:run
+sh ./mvnw -v
+sh ./mvnw spring-boot:run
 ```
 
-JDK가 이미 준비되어 있다면 설치 단계는 생략하고 JAVA_HOME을 설정하세요. 스크립트로 설치한 JDK는 프로젝트 `.tools/java-home`에 위치하며 `./mvnw`가 우선 사용합니다. 시스템 Java는 변경하지 않습니다.
+기본 주소는 [localhost:8080](http://localhost:8080)입니다. IntelliJ에서는 이 디렉터리의 `pom.xml`을 열고 JDK 21로 `ApartmentApplication`을 실행합니다. `PORT=8081`을 지정하면 개발 포트를 바꿀 수 있습니다. 포트 변경만으로 DB 연결이 바뀌지는 않습니다.
 
-[localhost:8080](http://localhost:8080)에 접속합니다. 기본 local 프로필은 로컬 주소에만 바인딩하며 API 키와 Docker가 필요 없습니다. 실행 터미널에서 `Ctrl+C`로 종료합니다.
+[PostgreSQL 개발 설정](docs/postgresql.md) · [환경 설정 상세](docs/development.md)
 
-IntelliJ에서는 `pom.xml`을 Maven 프로젝트로 열고, Project SDK와 실행 구성 JRE를 패치된 JDK 21로 지정하세요. 프로젝트 JDK를 설치했다면 `.tools/java-home`를 사용하고 Maven 프로젝트를 다시 불러오세요. Windows에서는 JDK 21과 Maven을 설치하여 `mvn spring-boot:run`으로 실행할 수 있으나 이 환경은 검증하지 않았습니다.
-
-## 검증
+## 3. Docker 앱·DB 실행
 
 ```sh
-./mvnw verify
-# 패키징된 의존성을 OSV에서 조회 (인터넷 필요)
-python3 scripts/audit-dependencies.py
-```
-
-2026-10-26 API 연결 코드 추가 후 테스트 30개가 통과했습니다. 런타임 의존성 63개 조회에서 알려진 취약점 매칭은 0개였습니다. 이는 모든 취약점이 없다는 보장이 아닙니다. OSV 스크립트는 프로젝트 `.m2/repository`를 사용하므로 시스템 Maven을 사용하는 경우 `./mvnw -Dmaven.repo.local="$PWD/.m2/repository" package`로 먼저 빌드하세요.
-
-[검증 기록](docs/verification.md) · [보안 보완 결과](docs/reports/security-remediation-2026-10-26.md)
-
-## 설계 개요
-
-```mermaid
-flowchart LR
-    B[브라우저] --> F[보안 필터]
-    F --> C[Spring MVC Controller]
-    C --> T[Thymeleaf HTML / JSON]
-    C --> S[SearchService]
-    S --> J[NamedParameterJdbcTemplate]
-    J --> D[(H2 / PostgreSQL)]
-    M[Flyway] --> D
-```
-
-SQL과 실행 계획을 직접 관찰할 수 있도록 JDBC를 사용합니다. 현재 `OFFSET + COUNT`를 성능 비교의 기준으로 두고 있으며, 데이터가 커질 때의 비용은 아직 측정하지 않았습니다. 설계 근거와 한계는 [설계 결정 기록](docs/decisions/001-mvp-design.md)에 정리했습니다.
-
-## API와 실행 환경
-
-| 경로 | 기능 |
-| --- | --- |
-| `/` | 검색 화면 |
-| `/trades/{id}` | 거래 상세 |
-| `/saved` | 브라우저 관심 목록 |
-| `/api/trades` | 검색 결과 JSON |
-| `/actuator/health` | 서버 상태 |
-
-[검색 파라미터](docs/api.md) · [Docker·환경 변수·부하 테스트 안내](docs/development.md)
-
-## 다음 단계
-
-1. 실제 데이터의 누락 필드 정책 검증과 지역 확장
-2. 전국 지역 확장·정기 수집과 PostgreSQL 통합 테스트
-3. 대량 테스트 데이터 생성과 실행 계획·부하 측정
-4. 인덱스·페이지네이션·캐시 변경 전후 비교
-5. CI 실행 검증, 클라우드 배포와 운영 관측
-
-클라우드 리소스는 생성하지 않았습니다. 대용량 처리 성과는 측정 조건과 결과를 확보한 뒤 문서화할 예정입니다.
-
-## 문서와 개발 방식
-
-- [요구사항 및 구현 범위](docs/requirements.md)
-- [구조와 데이터 모델](docs/architecture.md)
-- [검증 결과와 미검증 범위](docs/verification.md)
-- [AI 활용 및 검증 원칙](docs/ai-workflow.md)
-- [GitHub 첫 업로드 안내](docs/publishing.md)
-- [작업 규칙](AGENTS.md)
-
-AI 코딩 도구를 활용해 구현하고 테스트·실행 결과로 변경을 검증했습니다. 초기 구현 전체를 TDD로 주장하지 않으며, 보안 보완에서는 신규 테스트 3개의 실패를 확인한 뒤 수정한 기록이 있습니다.
-
-## Docker로 앱과 PostgreSQL 실행
-
-Docker Desktop을 실행한 뒤 프로젝트 폴더에서:
-
-```sh
+# 최초 한 번만 복사. 이미 환경 파일이 있으면 덮어쓰지 않습니다.
 cp .env.example .env.docker
-# DB_PASSWORD 변경, 실제 수집은 MOLIT_SERVICE_KEY 설정
+# .env.docker의 DB_PASSWORD를 설정한 다음 실행
 sh scripts/stack.sh up
-sh scripts/stack.sh import
+sh scripts/stack.sh status
 ```
 
-http://localhost:8082 접속. 키는 일회성 수집 컨테이너에만 전달하며 앱과 DB는 함께 실행됩니다. 이미 `.env.docker`가 있으면 복사하지 말고 기존 설정을 사용하세요.
+기본 접속 주소는 [localhost:8082](http://localhost:8082)입니다. 컨테이너 내부 앱 포트는 8080이며 외부 포트와 구분합니다. PostgreSQL 데이터는 Docker 볼륨에 저장됩니다. 처음 생성한 DB에는 실제 거래가 자동으로 들어가지 않습니다.
 
-[전체 Docker 실행·종료·데이터 유지 안내](docs/docker.md)
-## PostgreSQL 개발 환경
+```sh
+# 앱과 DB 중지 — 데이터 볼륨 유지
+sh scripts/stack.sh stop
+```
 
-[PostgreSQL 실행 및 테스트 안내](docs/postgresql.md). Docker의 전용 DB를 5433 포트에 실행하고 IntelliJ 앱을 8081 포트로 연결할 수 있습니다. 기본 H2 실행과 별도이며, `sh scripts/test-postgres.sh`로 실제 PostgreSQL 통합 테스트를 실행합니다.
+공공 API 수집은 별도 importer로 실행합니다. 먼저 [공공 API 안내](docs/public-api.md)와 [전국 수집 안내](docs/nationwide-collection.md)를 읽고 대상 DB·지역·기간을 확인하세요. 운영 DB에 연습용 수집을 실행하지 않습니다.
 
-## 지역·기간 수집 확장
+[Docker 상세](docs/docker.md) · [배포 절차](docs/deployment.md)
 
-`molit.regions`에 코드:시도:시군구 목록, `molit.from`/`molit.to`에 계약월 범위를 지정할 수 있습니다. 기존 단일 월 실행도 유지합니다. [실행 예시·실패 구간 재실행](docs/public-api.md#여러-지역기간-수집)을 참고하세요.
+## 4. 검증 명령
 
-## 전국 시도 조회
+```sh
+# 기본 Java 테스트
+sh ./mvnw verify
 
-검색 화면에서 전국 17개 시도를 선택할 수 있습니다. 전체 지역은 저장된 모든 거래를 조회하며, 시도 축약명과 공식 명칭을 함께 검색합니다. 미수집 지역·기간은 결과가 없을 수 있습니다. 전국 데이터 자동 수집 완료를 의미하지 않습니다.
+# Docker가 필요하며 PostgreSQL 통합 테스트를 포함
+sh ./mvnw -Ppostgres-it verify
 
-## 기본 서버 배포 준비
+# 외부 API를 호출하지 않는 브라우저 동작 모의 테스트
+node scripts/test-bookmark-access.cjs
+node scripts/test-detail-map.cjs
 
-Caddy 자동 HTTPS, 앱·DB 포트 비공개, 로컬 환경변수 파일, DB 백업 스크립트를 추가했습니다. [서버 준비·실행·백업·복원 안내](docs/deployment.md)를 따르세요. AWS 서버에서 무료 DNS 주소와 공인 TLS 인증서로 공개 접속을 확인했습니다(2026-10-29).
+# 수집 재개 스크립트 테스트
+python3 scripts/test_collect_nationwide.py
+```
 
-전국 수집 준비·재개 방법: [수집 운영 안내](docs/nationwide-collection.md).
+테스트 fixture는 실제 거래로 표시하지 않습니다. 공공 API를 부하 테스트 대상으로 사용하지 않습니다. CI 구성은 [워크플로](../../.github/workflows/ci.yml)를 참고하세요. k6 스크립트 준비와 성능 개선 검증 완료는 구분합니다.
 
-데모 자동 생성과 DEMO_DATA 설정은 제거했습니다. 실제 거래는 postgres 또는 molit 프로필로 조회합니다. 이전 demo 실행 설정은 local로 변경하세요. 테스트 fixture는 src/test에만 존재하며 배포 JAR에 포함하지 않습니다. 기존 DB 데이터는 자동 삭제하지 않습니다.
+## 5. 화면과 코드 위치
 
-수집 작업 DB 이력·관리 API·실패 재시도: [운영 안내](docs/collection-jobs.md). 기본 비활성화이며 전용 관리 토큰 설정이 필요합니다.
+| 기능 | 주소 | 주요 코드 |
+| --- | --- | --- |
+| 검색 | `/`, `/api/trades` | `trade/`, `templates/index.html` |
+| 상세·지도 | `/trades/{id}` | `templates/detail.html`, `static/js/detail-map.js` |
+| 회원가입·로그인·내 계정 | `/signup`, `/login`, `/account` | `account/`, `common/security/` |
+| 관심 목록 | `/saved`, `/api/account/bookmarks` | `bookmark/`, `templates/saved.html` |
+| 수집 관리자 | `/admin` | `collection/jobs/`, `templates/admin.html` |
 
-- [아파트 상세 지도 설정 및 검증](docs/maps.md)
+Java 패키지의 기준 경로는 `src/main/java/kr/aptfolio/`, 화면 리소스의 기준 경로는 `src/main/resources/`입니다. 관리 기능은 별도 활성화와 관리자 자격 증명 설정이 필요합니다.
 
-[폴더 구조와 문서 안내](docs/README.md)
+## 6. 기능별 문서
+
+- [사용자 로그인](docs/user-login.md) · [관리자 로그인](docs/admin-login.md)
+- [계정별 관심 아파트](docs/bookmarks.md) · [지도 설정](docs/maps.md)
+- [수집 작업 관리](docs/collection-jobs.md) · [검색 API](docs/api.md)
+- [설계 결정](docs/decisions/001-mvp-design.md) · [과거 검증 기록](docs/verification.md)
+
+날짜가 명시된 과거 문서는 당시 상태의 기록입니다. 현재 구현 범위는 저장소 소개 보고서와 소스 코드를 함께 확인하세요. JavaScript 지도 키가 없으면 외부 검색 링크만 제공하며, 카카오 로그인은 아직 구현되지 않았습니다.
