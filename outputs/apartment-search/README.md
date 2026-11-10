@@ -87,3 +87,5 @@ Java 패키지의 기준 경로는 `src/main/java/kr/aptfolio/`, 화면 리소�
 - [설계 결정](docs/decisions/001-mvp-design.md) · [과거 검증 기록](docs/verification.md)
 
 날짜가 명시된 과거 문서는 당시 상태의 기록입니다. 현재 구현 범위는 저장소 소개 보고서와 소스 코드를 함께 확인하세요. JavaScript 지도 키가 없으면 외부 검색 링크만 제공하며, 카카오 로그인은 아직 구현되지 않았습니다.
+
+- [2026-11-10 로컬 수집 데이터 반영 기록](docs/local-data-transfer-20261110.md)
