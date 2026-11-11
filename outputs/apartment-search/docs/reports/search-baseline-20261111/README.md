@@ -14,6 +14,37 @@
 | 한화포레나인천구월 부분 일치 | 44.536 | 43.662 | 43.655~45.642 |
 | 전국 최신순 page=10000, OFFSET 120000 | 35.753 | 263.698 | 235.652~492.947 |
 
+## 측정 결과 시각화
+
+![69만 건 검색 SQL 성능: 쿼리별 중앙값과 목록 쿼리 3회 관측값](search-baseline.png)
+
+왼쪽은 COUNT와 목록 쿼리의 중앙값을 분리한 막대그래프다. 오른쪽은 목록 쿼리의 실행 순서별 관측값이다. **두 그래프는 개선 전의 동일한 측정값**이며, 오른쪽 선의 감소를 최적화 성과로 해석하지 않는다. 캐시를 통제하지 않아 감소 원인을 캐시 하나로 확정할 수도 없다. 그래프의 시간축은 0에서 시작한다.
+
+| 그래프 표시 | 의미 |
+|---|---|
+| COUNT / LIST | 전체 결과 건수 조회 / 12개 거래 목록 조회 |
+| Nationwide / first page | 전국 최신순 첫 페이지 |
+| Apartment keyword | 한화포레나인천구월 부분 일치 검색 |
+| Deep page / offset 120,000 | page=10000, 앞의 120,000건을 건너뛴 조회 |
+
+### 회차별 목록 조회 시간
+
+| 시나리오 | 1회(ms) | 2회(ms) | 3회(ms) |
+|---|---:|---:|---:|
+| 전국 최신순 첫 페이지 | 255.065 | 72.604 | 53.037 |
+| 아파트 부분 일치 | 43.655 | 43.662 | 45.642 |
+| 깊은 페이지 | 492.947 | 263.698 | 235.652 |
+
+### 이 측정으로 확인한 범위
+
+| 확인한 내용 | 아직 확인하지 않은 내용 |
+|---|---|
+| 로컬 DB의 SQL 실행 시간과 실행 계획 | AWS 운영 환경의 응답 시간 |
+| 3회 관측값과 중앙값, 변동 범위 | p95·p99, 동시 사용자 처리량 |
+| 깊은 페이지의 임시 디스크 정렬 | 인덱스 추가 후 실제 개선 효과 |
+
+[확대 가능한 SVG](search-baseline.svg) · [그래프 생성 코드](render_charts.py)
+
 ## 관찰 및 다음 실험
 
 - 전국 최신순 목록은 병렬 순차 스캔과 정렬을 사용했다. 현재 인덱스 `(region, deal_date DESC, id DESC)`는 지역 조건 없는 정렬을 직접 지원하지 않는다. 다음으로 `(deal_date DESC, id DESC)` 인덱스를 로컬에서 비교할 가치가 있다. 효과는 아직 검증하지 않았다.
@@ -39,3 +70,11 @@ docker exec -i house-finder-stack-db-1 psql -X -q -A -t -v ON_ERROR_STOP=1 -U ap
 기존 인덱스: trade_pkey(id), idx_trade_region_date(region, deal_date DESC, id DESC), idx_trade_apartment_date(apartment, deal_date DESC, id DESC), idx_trade_source_key(source_key, UNIQUE), idx_trade_source_region_month(source, source_region, source_month).
 
 검증: SQL 3종 각 3회 실행 성공, JSON 실행 계획 18개 파싱 성공. 앱 동작 변경이 없어 Java 테스트는 이번 로컬 작업에서 재실행하지 않았다. PR 필수 CI는 별도로 확인해야 한다.
+
+### 그래프 재생성
+
+별도 Python 환경에 `matplotlib`을 설치한 뒤 이 폴더의 `render_charts.py`를 실행한다. `plans.json`만 읽어 PNG와 SVG를 생성하며 DB나 네트워크에 접속하지 않는다. 앱 실행 의존성에는 추가하지 않았다.
+
+```sh
+python render_charts.py
+```
