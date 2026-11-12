@@ -10,7 +10,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class WebController {
  private final SearchService service;
  private final KakaoMapSettings maps;
- public WebController(SearchService service,KakaoMapSettings maps){this.service=service;this.maps=maps;}
+ private final TradeTrends trends;
+ public WebController(SearchService service,KakaoMapSettings maps,TradeTrends trends){this.service=service;this.maps=maps;this.trends=trends;}
  @ModelAttribute void shared(Model m){m.addAttribute("dataNotice",service.dataNotice());m.addAttribute("regions",Provinces.all());}
  @GetMapping("/") String home(@RequestParam Map<String,String> params,Model m){
   var result=service.search(params);m.addAttribute("result",result);m.addAttribute("filters",params);m.addAttribute("selectedRegion",Provinces.canonical(params.getOrDefault("region","")));
@@ -19,12 +20,13 @@ public class WebController {
  }
  private String pageUrl(Map<String,String> params,int page){var b=UriComponentsBuilder.fromPath("/");params.forEach((k,v)->{if(!k.equals("page"))b.queryParam(k,v);});return b.queryParam("page",page).build().encode().toUriString();}
  @GetMapping("/api/trades") @ResponseBody SearchService.Results api(@RequestParam Map<String,String> params){return service.search(params);}
- @GetMapping("/trades/{id}") String detail(@PathVariable long id,Model m){
+ @GetMapping("/trades/{id}") String detail(@PathVariable long id,@RequestParam(defaultValue="12") int months,Model m){
   var t=service.find(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
   m.addAttribute("mapKey",maps.key());
   m.addAttribute("mapSearchUrl","https://map.kakao.com/link/search/"+org.springframework.web.util.UriUtils.encodePathSegment(t.address(),java.nio.charset.StandardCharsets.UTF_8));
+  m.addAttribute("trend",trends.monthly(t,months));
   var history=service.history(t);m.addAttribute("trade",t);m.addAttribute("history",history);
-  m.addAttribute("chartMax",history.stream().mapToLong(Trade::price).max().orElse(1));return "detail";
+  return "detail";
  }
  @GetMapping("/saved") String saved(){return "saved";}
  @ExceptionHandler(IllegalArgumentException.class) @ResponseStatus(HttpStatus.BAD_REQUEST)

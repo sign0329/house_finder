@@ -45,6 +45,7 @@ class PostgresIT {
  @Autowired MolitStore store;
  @Autowired kr.aptfolio.collection.jobs.CollectionJobs jobs;
  @Autowired SearchService search;
+ @Autowired kr.aptfolio.trade.TradeTrends trends;
  @Autowired kr.aptfolio.bookmark.Bookmarks bookmarks;
  @Autowired kr.aptfolio.collection.jobs.CollectionCoverage coverage;
  @Autowired MockMvc mvc;
@@ -211,5 +212,14 @@ class PostgresIT {
   db.update("insert into trade(region,district,apartment,address,area,floor,built_year,deal_date,price,source) values('서울','종로구','가상','주소',84,1,2010,'2026-09-01',100,'TEST')");
   assertThrows(IllegalArgumentException.class,()->store.replace(MONTH,List.of(item("실제"))));
   assertEquals("TEST",db.queryForObject("select source from trade",String.class));
+ }
+
+ @Test void aggregatesMonthlyTrendOnPostgres(){
+  db.update("insert into trade(region,district,apartment,address,area,floor,built_year,deal_date,price,source) values('서울','검증구','월별검증','주소',84.1234,1,2020,'2026-10-01',10000,'TEST'),('서울','검증구','월별검증','주소',84.1234,2,2020,'2026-10-31',20001,'TEST')");
+  var trade=search.search(Map.of("q","월별검증")).items().getFirst();
+  var trend=trends.monthly(trade,6);
+  assertEquals(6,trend.points().size());assertEquals(2,trend.total());
+  assertEquals(new BigDecimal("15000.50"),trend.points().getLast().averagePrice());
+  assertNull(trend.points().getFirst().averagePrice());
  }
 }
