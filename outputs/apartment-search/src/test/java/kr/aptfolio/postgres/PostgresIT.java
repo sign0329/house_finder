@@ -149,9 +149,10 @@ class PostgresIT {
  }
  @Test void appliesAllMigrationsOnPostgres17() {
   assertTrue(db.queryForObject("select version()",String.class).startsWith("PostgreSQL 17."));
-  assertEquals(8,db.queryForObject("select count(*) from flyway_schema_history where success=true and type='SQL'",Integer.class));
+  assertEquals(9,db.queryForObject("select count(*) from flyway_schema_history where success=true and type='SQL'",Integer.class));
   assertEquals(4,db.queryForObject("select numeric_scale from information_schema.columns where table_schema='public' and table_name='trade' and column_name='area'",Integer.class));
   assertEquals(1,db.queryForObject("select count(*) from pg_indexes where schemaname='public' and indexname='idx_trade_source_key'",Integer.class));
+  assertTrue(db.queryForObject("select indexdef from pg_indexes where schemaname='public' and indexname='idx_trade_recent_date'",String.class).endsWith("(deal_date DESC, id DESC)"));
  }
  @Test void storesParsedTradesAndServesSearchAndDetail() throws Exception {
   String xml="""
