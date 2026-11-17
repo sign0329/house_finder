@@ -81,6 +81,8 @@ Java 패키지의 기준 경로는 `src/main/java/kr/aptfolio/`, 화면 리소�
 
 ## 6. 기능별 문서
 
+- [Java 코드 스타일 및 자동 정렬](docs/code-style.md)
+
 - [사용자 로그인](docs/user-login.md) · [관리자 로그인](docs/admin-login.md)
 - [계정별 관심 아파트](docs/bookmarks.md) · [지도 설정](docs/maps.md)
 - [수집 작업 관리](docs/collection-jobs.md) · [검색 API](docs/api.md)

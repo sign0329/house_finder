@@ -6,10 +6,18 @@ import org.springframework.web.bind.annotation.*;
 
 @ControllerAdvice
 public class AccountNavigation {
- @ModelAttribute public void navigation(Authentication authentication,Model model) {
-  boolean user=authentication!=null&&authentication.getAuthorities().stream().anyMatch(a->a.getAuthority().equals("ROLE_USER"));
-  boolean admin=authentication!=null&&authentication.getAuthorities().stream().anyMatch(a->a.getAuthority().equals("ROLE_ADMIN"));
-  model.addAttribute("bookmarkUser",user?authentication.getName():"");
-  model.addAttribute("userSignedIn",user);model.addAttribute("adminSignedIn",admin);
- }
+    @ModelAttribute
+    public void navigation(Authentication authentication, Model model) {
+        boolean user =
+                authentication != null
+                        && authentication.getAuthorities().stream()
+                                .anyMatch(a -> a.getAuthority().equals("ROLE_USER"));
+        boolean admin =
+                authentication != null
+                        && authentication.getAuthorities().stream()
+                                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        model.addAttribute("bookmarkUser", user ? authentication.getName() : "");
+        model.addAttribute("userSignedIn", user);
+        model.addAttribute("adminSignedIn", admin);
+    }
 }
