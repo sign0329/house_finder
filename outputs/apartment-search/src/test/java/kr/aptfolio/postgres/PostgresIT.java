@@ -77,6 +77,27 @@ class PostgresIT {
     }
 
     @Test
+    void memberBoardPersistsAndEnforcesOwnershipOnPostgres() {
+        db.update(
+                "insert into user_account(username,nickname,password_hash)"
+                        + " values('pg_board','회원','unused')");
+        var posts =
+                new kr.aptfolio.board.BoardPosts(
+                        new org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate(
+                                db));
+        long id = posts.create("pg_board", "게시글", "본문");
+        assertEquals("게시글", posts.get(id).title());
+        assertThrows(
+                org.springframework.web.server.ResponseStatusException.class,
+                () -> posts.update(id, "other", "변조", "내용"));
+        posts.update(id, "pg_board", "수정", "내용");
+        assertEquals("수정", posts.get(id).title());
+        posts.delete(id, "pg_board");
+        assertThrows(
+                org.springframework.web.server.ResponseStatusException.class, () -> posts.get(id));
+    }
+
+    @Test
     void concurrentBookmarksAreUniqueAndSurviveTradeRemoval() throws Exception {
         db.update(
                 "insert into user_account(username,nickname,password_hash)"
@@ -340,7 +361,7 @@ class PostgresIT {
         assertTrue(
                 db.queryForObject("select version()", String.class).startsWith("PostgreSQL 17."));
         assertEquals(
-                10,
+                11,
                 db.queryForObject(
                         "select count(*) from flyway_schema_history where success=true and"
                                 + " type='SQL'",
