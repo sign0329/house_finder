@@ -309,11 +309,38 @@ class PostgresIT {
     }
 
     @Test
+    void profilePhotoSurvivesServiceRecreationOnPostgres() throws Exception {
+        db.update(
+                "insert into user_account(username,nickname,password_hash) values('pg_photo','사진"
+                        + " 검증','fixture')");
+        var jdbc = new org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate(db);
+        var photos = new kr.aptfolio.account.ProfilePhotos(jdbc);
+        var bytes = new java.io.ByteArrayOutputStream();
+        javax.imageio.ImageIO.write(
+                new java.awt.image.BufferedImage(32, 32, java.awt.image.BufferedImage.TYPE_INT_RGB),
+                "png",
+                bytes);
+        photos.save(
+                "pg_photo",
+                new org.springframework.mock.web.MockMultipartFile(
+                        "photo", "profile.png", "image/png", bytes.toByteArray()));
+        var reloaded = new kr.aptfolio.account.ProfilePhotos(jdbc);
+        assertTrue(reloaded.exists("pg_photo"));
+        assertEquals(
+                32,
+                javax.imageio.ImageIO.read(
+                                new java.io.ByteArrayInputStream(reloaded.get("pg_photo")))
+                        .getWidth());
+        reloaded.delete("pg_photo");
+        assertFalse(photos.exists("pg_photo"));
+    }
+
+    @Test
     void appliesAllMigrationsOnPostgres17() {
         assertTrue(
                 db.queryForObject("select version()", String.class).startsWith("PostgreSQL 17."));
         assertEquals(
-                9,
+                10,
                 db.queryForObject(
                         "select count(*) from flyway_schema_history where success=true and"
                                 + " type='SQL'",
