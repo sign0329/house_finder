@@ -12,8 +12,13 @@ import java.security.Principal;
 @Controller
 public class AccountController {
     private final UserAccounts users;
+    private final ProfilePhotos photos;
+    private final kr.aptfolio.bookmark.Bookmarks bookmarks;
 
-    public AccountController(UserAccounts users) {
+    public AccountController(
+            UserAccounts users, ProfilePhotos photos, kr.aptfolio.bookmark.Bookmarks bookmarks) {
+        this.photos = photos;
+        this.bookmarks = bookmarks;
         this.users = users;
     }
 
@@ -62,6 +67,48 @@ public class AccountController {
     @GetMapping("/account")
     public String account(Principal principal, Model model) {
         model.addAttribute("profile", users.profile(principal.getName()));
+        model.addAttribute("hasPhoto", photos.exists(principal.getName()));
+        model.addAttribute("bookmarks", bookmarks.list(principal.getName()));
         return "account";
+    }
+
+    @PostMapping("/account/photo")
+    public String uploadPhoto(
+            Principal principal,
+            @RequestParam("photo") org.springframework.web.multipart.MultipartFile photo,
+            Model model,
+            HttpServletResponse response) {
+        try {
+            photos.save(principal.getName(), photo);
+            return "redirect:/account?photoUpdated";
+        } catch (IllegalArgumentException e) {
+            response.setStatus(400);
+            model.addAttribute("photoError", e.getMessage());
+            return account(principal, model);
+        }
+    }
+
+    @GetMapping("/account/photo")
+    public org.springframework.http.ResponseEntity<byte[]> photo(Principal principal) {
+        byte[] bytes = photos.get(principal.getName());
+        if (bytes == null)
+            return org.springframework.http.ResponseEntity.notFound()
+                    .header("Cache-Control", "no-store")
+                    .build();
+        return org.springframework.http.ResponseEntity.ok()
+                .header("Cache-Control", "no-store")
+                .contentType(org.springframework.http.MediaType.IMAGE_PNG)
+                .body(bytes);
+    }
+
+    @PostMapping("/account/photo/delete")
+    public String deletePhoto(Principal principal) {
+        photos.delete(principal.getName());
+        return "redirect:/account?photoDeleted";
+    }
+
+    @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+    public String tooLarge() {
+        return "redirect:/account?photoTooLarge";
     }
 }

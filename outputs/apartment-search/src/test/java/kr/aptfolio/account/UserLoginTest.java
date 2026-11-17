@@ -103,7 +103,7 @@ class UserLoginTest {
                                         .with(csrf())
                                         .param("username", "sessionuser")
                                         .param("password", "user-password-test"))
-                        .andExpect(redirectedUrl("/account"))
+                        .andExpect(redirectedUrl("/"))
                         .andExpect(authenticated().withRoles("USER"))
                         .andReturn();
         var session = (MockHttpSession) result.getRequest().getSession(false);

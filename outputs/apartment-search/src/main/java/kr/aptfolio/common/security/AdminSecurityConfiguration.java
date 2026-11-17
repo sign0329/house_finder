@@ -127,7 +127,7 @@ public class AdminSecurityConfiguration {
                         f ->
                                 f.loginPage("/login")
                                         .loginProcessingUrl("/login")
-                                        .defaultSuccessUrl("/account", true)
+                                        .defaultSuccessUrl("/", true)
                                         .failureUrl("/login?error")
                                         .permitAll())
                 .logout(

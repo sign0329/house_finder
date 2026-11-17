@@ -1,1 +1,69 @@
-<!DOCTYPE html><html lang="ko" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>내 계정 · 집결</title><link rel="stylesheet" href="/css/app.css"><link rel="stylesheet" href="/css/account.css"></head><body><header th:replace="~{fragments :: header('account')}"></header><main id="main-content" tabindex="-1" class="account-shell"><div class="account-intro"><span class="account-eyebrow">MY ACCOUNT</span><h1><span th:text="${profile.nickname}">사용자</span>님,<br>환영합니다.</h1><p>계정 정보를 확인하고<br>원하는 지역의 거래를 살펴보세요.</p><a href="/">실거래가 탐색 →</a></div><section class="account-card"><h2>내 계정</h2><dl><dt>아이디</dt><dd th:text="${profile.username}"></dd><dt>닉네임</dt><dd th:text="${profile.nickname}"></dd><dt>가입일 (서버 시간)</dt><dd th:text="${#temporals.format(profile.createdAt, 'yyyy-MM-dd HH:mm')}"></dd></dl><p class="account-help">관심 아파트는 계정에 저장됩니다. 다른 기기에서도 로그인해 확인할 수 있습니다.</p><form method="post" th:action="@{/logout}"><button class="account-submit">로그아웃</button></form></section></main></body></html>
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>마이페이지 · 집결</title>
+    <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="/css/account.css">
+    <script defer src="/js/forms.js"></script>
+</head>
+<body>
+<header th:replace="~{fragments :: header('account')}"></header>
+<main id="main-content" tabindex="-1" class="profile-shell">
+    <div class="profile-heading">
+        <span class="account-eyebrow">MY PAGE</span>
+        <h1><span th:text="${profile.nickname}">사용자</span>님의 마이페이지</h1>
+        <p>내 프로필을 꾸미고, 관심 있는 아파트를 다시 살펴보세요.</p>
+        <a class="secondary" href="/">실거래가 탐색 →</a>
+    </div>
+    <div class="profile-layout">
+        <section class="account-card" aria-labelledby="profile-title">
+            <h2 id="profile-title">내 프로필</h2>
+            <img th:if="${hasPhoto}" src="/account/photo" class="profile-avatar" alt="내 프로필 사진" width="128" height="128">
+            <div th:unless="${hasPhoto}" class="profile-avatar profile-placeholder" role="img" aria-label="프로필 사진 미등록">집</div>
+            <p th:if="${param.photoUpdated}" class="account-success" role="status">프로필 사진을 저장했습니다.</p>
+            <p th:if="${param.photoDeleted}" class="account-success" role="status">프로필 사진을 삭제했습니다.</p>
+            <p th:if="${photoError}" class="account-alert" role="alert" th:text="${photoError}"></p>
+            <p th:if="${param.photoTooLarge}" class="account-alert" role="alert">사진은 2MB 이하 파일을 선택해주세요.</p>
+            <form method="post" th:action="@{/account/photo}" enctype="multipart/form-data" data-feedback-form>
+                <label for="profile-photo">프로필 사진 선택</label>
+                <input id="profile-photo" name="photo" type="file" accept="image/png,image/jpeg" required aria-describedby="photo-help">
+                <p id="photo-help" class="account-help">PNG/JPEG · 최대 2MB · 가로·세로 4096px 이하, 총 800만 화소 이하. 사진은 최대 256px로 저장됩니다.</p>
+                <button type="submit" class="account-submit">사진 저장</button>
+                <p class="form-status" role="status" aria-live="polite"></p>
+            </form>
+            <form th:if="${hasPhoto}" method="post" th:action="@{/account/photo/delete}" class="photo-delete">
+                <button type="submit" class="secondary">사진 삭제</button>
+            </form>
+            <dl>
+                <dt>아이디</dt><dd th:text="${profile.username}"></dd>
+                <dt>닉네임</dt><dd th:text="${profile.nickname}"></dd>
+                <dt>가입일 (서버 시간)</dt><dd th:text="${#temporals.format(profile.createdAt, 'yyyy-MM-dd HH:mm')}"></dd>
+            </dl>
+            <form method="post" th:action="@{/logout}"><button type="submit" class="secondary">로그아웃</button></form>
+        </section>
+        <section class="account-card profile-bookmarks" aria-labelledby="bookmarks-title">
+            <div class="profile-section-heading">
+                <h2 id="bookmarks-title">관심 아파트 <span class="count" th:text="${#lists.size(bookmarks)}">0</span></h2>
+                <a href="/saved" class="secondary">관심 목록 관리</a>
+            </div>
+            <p class="account-help">내 계정에 저장한 아파트입니다. 다른 기기에서도 로그인해 확인할 수 있어요.</p>
+            <div class="empty" th:if="${#lists.isEmpty(bookmarks)}">
+                <h3>아직 저장한 아파트가 없어요</h3>
+                <p>검색 결과에서 별을 누르면 여기에 모아볼 수 있어요.</p>
+                <a class="primary" href="/">아파트 둘러보기 →</a>
+            </div>
+            <div class="profile-bookmark-list" th:unless="${#lists.isEmpty(bookmarks)}">
+                <article class="profile-bookmark" th:each="item : ${bookmarks}">
+                    <p class="account-help" th:text="${item.location}"></p>
+                    <h3 th:text="${item.name}"></h3>
+                    <a th:if="${item.tradeId != null}" th:href="@{/trades/{id}(id=${item.tradeId})}" class="secondary">최근 거래 보기 →</a>
+                    <p th:unless="${item.tradeId != null}" class="account-help">현재 조회 가능한 거래가 없습니다.</p>
+                </article>
+            </div>
+        </section>
+    </div>
+</main>
+</body>
+</html>
