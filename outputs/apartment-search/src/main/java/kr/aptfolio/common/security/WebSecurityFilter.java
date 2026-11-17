@@ -12,8 +12,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.time.Clock;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /** Bounded, per-process fixed-window limit. Forwarded client headers are never trusted. */
 @Component
@@ -22,6 +24,7 @@ public class WebSecurityFilter extends OncePerRequestFilter {
     @org.springframework.beans.factory.annotation.Autowired
     private kr.aptfolio.trade.KakaoMapSettings maps;
 
+    private final Clock clock;
     private final int perClient;
     private final int globalLimit;
     private final Map<String, Integer> counts = new HashMap<>();
@@ -31,11 +34,18 @@ public class WebSecurityFilter extends OncePerRequestFilter {
     private long loginWindow = -1;
     private int loginTotal;
 
+    public WebSecurityFilter(int perClient, int globalLimit) {
+        this(perClient, globalLimit, Optional.empty());
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
     public WebSecurityFilter(
             @Value("${app.security.requests-per-minute:120}") int perClient,
-            @Value("${app.security.global-requests-per-minute:6000}") int globalLimit) {
+            @Value("${app.security.global-requests-per-minute:6000}") int globalLimit,
+            Optional<Clock> clock) {
         if (perClient < 1 || globalLimit < 1)
             throw new IllegalArgumentException("Request limits must be positive");
+        this.clock = clock.orElseGet(Clock::systemUTC);
         this.perClient = perClient;
         this.globalLimit = globalLimit;
     }
@@ -95,7 +105,7 @@ public class WebSecurityFilter extends OncePerRequestFilter {
         String path = req.getRequestURI();
         if ((path.equals("/admin/login") || path.equals("/login") || path.equals("/signup"))
                 && req.getMethod().equals("POST")
-                && !allowLogin(req.getRemoteAddr(), System.currentTimeMillis())) {
+                && !allowLogin(req.getRemoteAddr(), clock.millis())) {
             res.setStatus(429);
             res.setHeader("Retry-After", "60");
             res.setHeader("Cache-Control", "no-store");
@@ -105,7 +115,7 @@ public class WebSecurityFilter extends OncePerRequestFilter {
         }
         boolean search =
                 path.equals("/") || path.equals("/api/trades") || path.startsWith("/trades/");
-        if (search && !allow(req.getRemoteAddr(), System.currentTimeMillis())) {
+        if (search && !allow(req.getRemoteAddr(), clock.millis())) {
             res.setStatus(429);
             res.setHeader("Retry-After", "60");
             res.setHeader("Cache-Control", "no-store");

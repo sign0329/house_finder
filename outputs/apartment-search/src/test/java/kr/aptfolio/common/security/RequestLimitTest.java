@@ -21,4 +21,13 @@ class RequestLimitTest {
         assertThat(f.allow("b", 0)).isTrue();
         assertThat(f.allow("c", 0)).isFalse();
     }
+
+    @org.junit.jupiter.api.Test
+    void loginLimitResetsOnlyAtNextMinute() {
+        var filter = new WebSecurityFilter(120, 6000);
+        for (int i = 0; i < 10; i++)
+            org.junit.jupiter.api.Assertions.assertTrue(filter.allowLogin("client", 59999));
+        org.junit.jupiter.api.Assertions.assertFalse(filter.allowLogin("client", 59999));
+        org.junit.jupiter.api.Assertions.assertTrue(filter.allowLogin("client", 60000));
+    }
 }

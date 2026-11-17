@@ -23,8 +23,18 @@ import org.springframework.test.web.servlet.MockMvc;
             "COLLECTION_ADMIN_TOKEN=test-legacy-token-0123456789012345",
             "spring.datasource.url=jdbc:h2:mem:admin-login;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE"
         })
+@org.springframework.context.annotation.Import(AdminLoginTest.FixedTime.class)
 @AutoConfigureMockMvc
 class AdminLoginTest {
+    @org.springframework.boot.test.context.TestConfiguration(proxyBeanMethods = false)
+    static class FixedTime {
+        @org.springframework.context.annotation.Bean
+        java.time.Clock requestClock() {
+            return java.time.Clock.fixed(
+                    java.time.Instant.parse("2026-01-01T00:00:30Z"), java.time.ZoneOffset.UTC);
+        }
+    }
+
     @Autowired MockMvc mvc;
 
     @DynamicPropertySource
