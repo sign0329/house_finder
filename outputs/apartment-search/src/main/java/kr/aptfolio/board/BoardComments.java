@@ -39,9 +39,9 @@ public class BoardComments {
 
     public void create(long postId, String username, String body) {
         posts.get(postId);
-        body = body.strip();
-        if (body.isBlank() || body.length() > 2000)
-            throw new IllegalArgumentException("댓글은 1~2,000자로 입력하세요.");
+
+        if (body.isBlank() || body.codePointCount(0, body.length()) > 500)
+            throw new IllegalArgumentException("댓글은 1~500자로 입력하세요.");
         int rows =
                 db.update(
                         "insert into board_comment(post_id,user_id,body) select :postId,id,:body"

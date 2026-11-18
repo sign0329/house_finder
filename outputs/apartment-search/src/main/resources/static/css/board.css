@@ -12,3 +12,7 @@
 .board-body { white-space:pre-wrap; line-height:1.8; margin-top:28px; }
 .board-actions a,.board-actions summary { min-height:44px; display:inline-flex; align-items:center; cursor:pointer; }
 @media(max-width:600px) { .board-shell { margin:24px auto; padding:0 16px; } .board-card { padding:18px; } }
+
+.board-form textarea.comment-over-limit { border:2px solid #b42318; color:#b42318; }
+#comment-count.comment-over-limit { color:#b42318; font-weight:700; }
+.board-form button:disabled { opacity:.55; cursor:not-allowed; }

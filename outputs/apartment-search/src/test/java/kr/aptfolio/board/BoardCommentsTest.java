@@ -61,7 +61,8 @@ class BoardCommentsTest {
 
     @Test
     void invalidBodyAndMissingPostAreRejected() throws Exception {
-        for (String body : new String[] {" ", "가".repeat(2001)})
+        add("가".repeat(500));
+        for (String body : new String[] {" ", "가".repeat(501)})
             mvc.perform(
                             post("/board/" + id + "/comments")
                                     .with(user("cb"))
