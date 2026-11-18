@@ -12,8 +12,10 @@ import java.security.Principal;
 @RequestMapping("/board")
 public class BoardController {
     private final BoardPosts posts;
+    private final BoardComments comments;
 
-    public BoardController(BoardPosts posts) {
+    public BoardController(BoardPosts posts, BoardComments comments) {
+        this.comments = comments;
         this.posts = posts;
     }
 
@@ -49,10 +51,19 @@ public class BoardController {
     }
 
     @GetMapping("/{id}")
-    public String detail(@PathVariable long id, Principal principal, Model model) {
+    public String detail(
+            @PathVariable long id,
+            @RequestParam(defaultValue = "0") int commentPage,
+            Principal principal,
+            Model model) {
         var post = posts.get(id);
         model.addAttribute("post", post);
         model.addAttribute("owner", post.username().equals(principal.getName()));
+        var items = comments.list(id, commentPage);
+        model.addAttribute("comments", items.stream().limit(20).toList());
+        model.addAttribute("commentPage", commentPage);
+        model.addAttribute("commentsNext", items.size() > 20);
+        model.addAttribute("viewer", principal.getName());
         return "board-detail";
     }
 
@@ -85,6 +96,31 @@ public class BoardController {
     public String delete(@PathVariable long id, Principal principal) {
         posts.delete(id, principal.getName());
         return "redirect:/board";
+    }
+
+    @PostMapping("/{id}/comments")
+    public String comment(
+            @PathVariable long id,
+            Principal principal,
+            @RequestParam(defaultValue = "") String body,
+            Model model,
+            HttpServletResponse response) {
+        try {
+            comments.create(id, principal.getName(), body);
+            return "redirect:/board/" + id + "#comments";
+        } catch (IllegalArgumentException e) {
+            response.setStatus(400);
+            model.addAttribute("commentError", e.getMessage());
+            model.addAttribute("commentBody", body);
+            return detail(id, 0, principal, model);
+        }
+    }
+
+    @PostMapping("/{id}/comments/{commentId}/delete")
+    public String deleteComment(
+            @PathVariable long id, @PathVariable long commentId, Principal principal) {
+        comments.delete(id, commentId, principal.getName());
+        return "redirect:/board/" + id + "#comments";
     }
 
     private String invalid(

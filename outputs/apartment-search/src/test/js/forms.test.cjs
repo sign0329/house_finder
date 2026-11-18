@@ -31,3 +31,16 @@ test('request feedback prevents duplicate submission and resets on back navigati
   assert.match(ui.status.textContent,/검색/);assert.equal(ui.submit(),true);
   ui.windowEvents.pageshow();assert.equal(ui.button.disabled,false);assert.equal(ui.status.textContent,'');assert.equal(ui.submit(),false);
 });
+test('comment limit counts Unicode characters, blocks 501 and recovers at 500',()=>{
+  const events={}, formEvents={}, windowEvents={};
+  const classes=()=>({toggle(name,on){this[name]=on;}});
+  const count={classList:classes()}, button={disabled:false};
+  const form={dataset:{},querySelector:s=>s==='#comment-count'?count:button,addEventListener:(n,f)=>formEvents[n]=f};
+  const input={value:'가'.repeat(500),dataset:{commentLimit:'500'},form,classList:classes(),setAttribute(n,v){this[n]=v;},setCustomValidity(v){this.error=v;},addEventListener:(n,f)=>events[n]=f};
+  runInNewContext(readFileSync('src/main/resources/static/js/comment-limit.js','utf8'),{document:{querySelectorAll:()=>[input]},window:{addEventListener:(n,f)=>windowEvents[n]=f}});
+  assert.equal(button.disabled,false);
+  input.value+='나';events.input();assert.equal(button.disabled,true);assert.equal(input.classList['comment-over-limit'],true);assert.match(count.textContent,/501/);
+  let blocked=false;formEvents.submit({preventDefault(){blocked=true;}});assert.equal(blocked,true);
+  input.value='😀'.repeat(500);events.input();assert.equal(button.disabled,false);assert.equal(input.error,'');assert.equal(input.classList['comment-over-limit'],false);
+  form.dataset.pending='true';events.input();assert.equal(button.disabled,true);
+});

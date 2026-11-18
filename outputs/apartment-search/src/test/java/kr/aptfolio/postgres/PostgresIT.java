@@ -77,6 +77,21 @@ class PostgresIT {
     }
 
     @Test
+    void boardCommentsPersistAndCascadeOnPostgres() {
+        db.update(
+                "insert into user_account(username,nickname,password_hash)"
+                        + " values('pg_comments','회원','unused')");
+        var jdbc = new org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate(db);
+        var posts = new kr.aptfolio.board.BoardPosts(jdbc);
+        var comments = new kr.aptfolio.board.BoardComments(jdbc, posts);
+        long id = posts.create("pg_comments", "제목", "본문");
+        comments.create(id, "pg_comments", "댓글");
+        assertEquals("댓글", comments.list(id, 0).getFirst().body());
+        posts.delete(id, "pg_comments");
+        assertTrue(comments.list(id, 0).isEmpty());
+    }
+
+    @Test
     void memberBoardPersistsAndEnforcesOwnershipOnPostgres() {
         db.update(
                 "insert into user_account(username,nickname,password_hash)"
@@ -361,7 +376,7 @@ class PostgresIT {
         assertTrue(
                 db.queryForObject("select version()", String.class).startsWith("PostgreSQL 17."));
         assertEquals(
-                11,
+                12,
                 db.queryForObject(
                         "select count(*) from flyway_schema_history where success=true and"
                                 + " type='SQL'",

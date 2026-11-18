@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-<head><th:block th:replace="~{fragments :: head('회원 게시판')}"></th:block><link rel="stylesheet" href="/css/board.css"></head>
+<head><th:block th:replace="~{fragments :: head('게시판')}"></th:block><link rel="stylesheet" href="/css/board.css"></head>
 <body><header th:replace="~{fragments :: header('board')}"></header><main id="main-content" class="board-shell">
-<div class="board-heading"><div><p>MEMBERS COMMUNITY</p><h1>회원 게시판</h1><p>집과 동네에 관한 이야기를 나눠보세요. 로그인한 회원만 볼 수 있습니다.</p></div><a class="board-button" href="/board/new">글쓰기</a></div>
+<div class="board-heading"><div><p>MEMBERS COMMUNITY</p><h1>게시판</h1><p>집과 동네에 관한 이야기를 나눠보세요. 로그인한 회원만 볼 수 있습니다.</p></div><a class="board-button" href="/board/new">글쓰기</a></div>
 <section class="board-card" aria-label="게시글 목록"><p th:if="${#lists.isEmpty(posts)}">아직 게시글이 없습니다. 첫 이야기를 남겨보세요.</p>
 <article class="board-row" th:each="post : ${posts}"><h2><a th:href="@{/board/{id}(id=${post.id})}" th:text="${post.title}">제목</a></h2><p><span th:text="${post.nickname}">작성자</span> · <time th:text="${#temporals.format(post.createdAt,'yyyy-MM-dd HH:mm')}"></time></p></article>
 </section><nav class="board-actions" aria-label="게시판 페이지"><a th:if="${page>0}" th:href="@{/board(page=${page-1})}">이전</a><span th:text="${page+1}+' 페이지'"></span><a th:if="${hasNext}" th:href="@{/board(page=${page+1})}">다음</a></nav>
