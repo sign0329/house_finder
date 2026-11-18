@@ -1,7 +1,17 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-<head><th:block th:replace="~{fragments :: head('회원 게시판')}"></th:block><link rel="stylesheet" href="/css/board.css"></head>
+<head><th:block th:replace="~{fragments :: head('게시판')}"></th:block><link rel="stylesheet" href="/css/board.css"></head>
 <body><header th:replace="~{fragments :: header('board')}"></header><main id="main-content" class="board-shell">
 <a href="/board">← 게시판 목록</a><article class="board-card"><h1 th:text="${post.title}">제목</h1><p><span th:text="${post.nickname}"></span> · <time th:text="${#temporals.format(post.createdAt,'yyyy-MM-dd HH:mm')}"></time></p><p class="board-body" th:text="${post.body}"></p></article>
 <div class="board-actions" th:if="${owner}"><a class="board-button" th:href="@{/board/{id}/edit(id=${post.id})}">수정</a><details><summary>글 삭제</summary><p>삭제하면 되돌릴 수 없습니다.</p><form method="post" th:action="@{/board/{id}/delete(id=${post.id})}"><button class="board-button" type="submit">삭제 확인</button></form></details></div>
-</main></body></html>
+<section id="comments" class="board-card" aria-labelledby="comments-title">
+<h2 id="comments-title">댓글</h2>
+<form class="board-form" method="post" th:action="@{/board/{id}/comments(id=${post.id})}" data-feedback-form>
+<p role="alert" th:if="${commentError}" th:text="${commentError}"></p>
+<label for="comment-body">댓글 작성</label><textarea id="comment-body" name="body" rows="3" required maxlength="2000" placeholder="이 게시글에 대한 의견을 남겨주세요." th:text="${commentBody}"></textarea>
+<p>최대 2,000자 · 최신 댓글부터 표시됩니다.</p><button class="board-button" type="submit">댓글 등록</button><p class="form-status" role="status"></p>
+</form><p th:if="${#lists.isEmpty(comments)}">아직 댓글이 없습니다.</p>
+<article class="board-row" th:each="comment : ${comments}"><p><strong th:text="${comment.nickname}"></strong> · <time th:text="${#temporals.format(comment.createdAt,'yyyy-MM-dd HH:mm')}"></time></p><p class="board-body" th:text="${comment.body}"></p>
+<details th:if="${comment.username == viewer}"><summary>댓글 삭제</summary><p>삭제하면 되돌릴 수 없습니다.</p><form method="post" th:action="@{/board/{id}/comments/{commentId}/delete(id=${post.id},commentId=${comment.id})}"><button class="board-button" type="submit">삭제 확인</button></form></details></article>
+<nav class="board-actions" aria-label="댓글 페이지"><a th:if="${commentPage>0}" th:href="@{/board/{id}(id=${post.id},commentPage=${commentPage-1})} + '#comments'">이전 댓글</a><span th:text="${commentPage+1}+' 페이지'"></span><a th:if="${commentsNext}" th:href="@{/board/{id}(id=${post.id},commentPage=${commentPage+1})} + '#comments'">다음 댓글</a></nav>
+</section></main></body></html>

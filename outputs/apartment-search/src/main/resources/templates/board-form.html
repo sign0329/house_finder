@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-<head><th:block th:replace="~{fragments :: head('회원 게시판')}"></th:block><link rel="stylesheet" href="/css/board.css"></head>
+<head><th:block th:replace="~{fragments :: head('게시판')}"></th:block><link rel="stylesheet" href="/css/board.css"></head>
 <body><header th:replace="~{fragments :: header('board')}"></header><main id="main-content" class="board-shell">
 <h1>게시글 작성·수정</h1><p>개인 연락처나 민감한 정보는 게시하지 마세요.</p>
 <form class="board-card board-form" method="post" th:action="${action}"><p role="alert" th:if="${error}" th:text="${error}"></p>
