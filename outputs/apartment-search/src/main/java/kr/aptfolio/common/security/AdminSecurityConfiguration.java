@@ -116,6 +116,8 @@ public class AdminSecurityConfiguration {
                 .authorizeHttpRequests(
                         a ->
                                 a.requestMatchers(
+                                                "/board",
+                                                "/board/**",
                                                 "/account",
                                                 "/account/**",
                                                 "/saved",

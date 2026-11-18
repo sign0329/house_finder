@@ -84,3 +84,7 @@ account 패키지의 UserAccounts/AccountController가 회원가입·로그인�
 ## 관심 아파트 DB 저장
 
 bookmark 패키지가 세션 사용자 기준의 저장·조회·삭제를 담당한다. V8 user_bookmark에 아파트 식별 필드를 보존하고 사용자 행 잠금과 유일 제약으로 중복 저장을 방지한다. 거래 스냅샷 삭제와 독립적으로 유지하며 조회 시 현재 거래 링크를 구한다. [상세 정책](bookmarks.md)을 참고한다.
+
+## 회원 게시판
+
+board 패키지의 BoardController → BoardPosts → JDBC 경로로 처리함. V11 board_post는 user_account를 참조하며 권한은 USER 세션 및 작성자 조건으로 제한함.
