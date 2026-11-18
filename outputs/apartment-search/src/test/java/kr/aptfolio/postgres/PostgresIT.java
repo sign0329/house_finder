@@ -77,6 +77,39 @@ class PostgresIT {
     }
 
     @Test
+    void reportDeduplicationAndModerationHistoryOnPostgres() {
+        db.update(
+                "insert into user_account(username,nickname,password_hash)"
+                        + " values('pg_report','신고자','unused')");
+        var jdbc = new org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate(db);
+        var posts = new kr.aptfolio.board.BoardPosts(jdbc);
+        var moderation = new kr.aptfolio.board.BoardModeration(jdbc);
+        long id = posts.create("pg_report", "검토", "본문");
+        moderation.report(id, null, "pg_report", "광고");
+        moderation.report(id, null, "pg_report", "중복");
+        assertEquals(
+                1,
+                db.queryForObject(
+                        "select count(*) from board_report where target_id=? and"
+                                + " target_type='POST'",
+                        Integer.class,
+                        id));
+        long report =
+                db.queryForObject(
+                        "select id from board_report where target_id=? and target_type='POST'",
+                        Long.class,
+                        id);
+        moderation.decide(report, "HIDE", "광고 확인", "operator");
+        assertThrows(
+                org.springframework.web.server.ResponseStatusException.class, () -> posts.get(id));
+        moderation.decide(report, "RESTORE", "재검토", "operator");
+        assertEquals("본문", posts.get(id).body());
+        assertEquals(2, moderation.history(report).size());
+        posts.delete(id, "pg_report");
+        assertFalse(moderation.list("ALL", 0).isEmpty());
+    }
+
+    @Test
     void boardCommentsPersistAndCascadeOnPostgres() {
         db.update(
                 "insert into user_account(username,nickname,password_hash)"
@@ -376,7 +409,7 @@ class PostgresIT {
         assertTrue(
                 db.queryForObject("select version()", String.class).startsWith("PostgreSQL 17."));
         assertEquals(
-                12,
+                13,
                 db.queryForObject(
                         "select count(*) from flyway_schema_history where success=true and"
                                 + " type='SQL'",

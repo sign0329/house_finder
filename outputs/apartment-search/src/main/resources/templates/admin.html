@@ -2,7 +2,7 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="csrf-token" th:content="${_csrf.token}"><meta name="csrf-header" th:content="${_csrf.headerName}">
 <title>수집 관리 · 집결</title><link rel="stylesheet" href="/css/admin.css"><script defer src="/js/admin.js"></script></head>
-<body><header><a class="brand" href="/">집결 <span>ADMIN</span></a><a href="/">실거래가 탐색 ↗</a></header>
+<body><header><a class="brand" href="/">집결 <span>ADMIN</span></a><a href="/admin/board">게시판 신고 관리</a><a href="/">실거래가 탐색 ↗</a></header>
 <main id="main-content" tabindex="-1"><div class="heading"><p class="eyebrow">DATA OPERATIONS</p><h1>수집 관리</h1><p>지역별 거래 수집 현황을 확인하고 실패한 작업을 다시 실행하세요.</p></div>
 <p id="message" role="status" aria-live="polite"></p>
 <div id="workspace"><div class="toolbar"><span>관리자 로그인됨 · 최근 100개 작업 기준</span><div><button id="refresh" class="secondary">새로고침</button> <form class="logout-form" method="post" th:action="@{/admin/logout}"><button class="secondary">로그아웃</button></form></div></div>
