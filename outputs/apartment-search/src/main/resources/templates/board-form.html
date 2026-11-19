@@ -4,6 +4,7 @@
 <body><header th:replace="~{fragments :: header('board')}"></header><main id="main-content" class="board-shell">
 <h1>게시글 작성·수정</h1><p>개인 연락처나 민감한 정보는 게시하지 마세요.</p>
 <form class="board-card board-form" method="post" th:action="${action}"><p role="alert" th:if="${error}" th:text="${error}"></p>
+<label for="post-category">분류</label><select id="post-category" name="category" required><option value="FREE" th:selected="${category=='FREE'}">자유</option><option value="QUESTION" th:selected="${category=='QUESTION'}">질문</option><option value="INFO" th:selected="${category=='INFO'}">정보</option></select>
 <label for="post-title">제목</label><input id="post-title" name="title" required maxlength="120" th:value="${title}">
 <label for="post-body">내용</label><textarea id="post-body" name="body" required maxlength="10000" rows="14" th:text="${body}"></textarea>
 <p>제목 최대 120자 · 내용 최대 10,000자</p><div class="board-actions"><button class="board-button" type="submit">저장</button><a href="/board">목록으로</a></div></form>

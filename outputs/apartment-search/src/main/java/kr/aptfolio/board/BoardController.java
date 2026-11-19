@@ -20,8 +20,16 @@ public class BoardController {
     }
 
     @GetMapping
-    public String list(@RequestParam(defaultValue = "0") int page, Model model) {
-        var items = posts.list(page);
+    public String list(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "") String q,
+            @RequestParam(defaultValue = "ALL") String category,
+            @RequestParam(defaultValue = "ALL") String scope,
+            Model model) {
+        var items = posts.list(page, q, category, scope);
+        model.addAttribute("q", q);
+        model.addAttribute("category", category);
+        model.addAttribute("scope", scope);
         model.addAttribute("posts", items.stream().limit(BoardPosts.PAGE_SIZE).toList());
         model.addAttribute("page", page);
         model.addAttribute("hasNext", items.size() > BoardPosts.PAGE_SIZE);
@@ -30,6 +38,7 @@ public class BoardController {
 
     @GetMapping("/new")
     public String form(Model model) {
+        model.addAttribute("category", "FREE");
         model.addAttribute("title", "");
         model.addAttribute("body", "");
         model.addAttribute("action", "/board");
@@ -39,13 +48,15 @@ public class BoardController {
     @PostMapping
     public String create(
             Principal principal,
+            @RequestParam(defaultValue = "FREE") String category,
             @RequestParam(defaultValue = "") String title,
             @RequestParam(defaultValue = "") String body,
             Model model,
             HttpServletResponse response) {
         try {
-            return "redirect:/board/" + posts.create(principal.getName(), title, body);
+            return "redirect:/board/" + posts.create(principal.getName(), title, body, category);
         } catch (IllegalArgumentException e) {
+            model.addAttribute("category", category);
             return invalid(title, body, "/board", e, model, response);
         }
     }
@@ -70,6 +81,7 @@ public class BoardController {
     @GetMapping("/{id}/edit")
     public String edit(@PathVariable long id, Principal principal, Model model) {
         var post = posts.owned(id, principal.getName());
+        model.addAttribute("category", post.category());
         model.addAttribute("title", post.title());
         model.addAttribute("body", post.body());
         model.addAttribute("action", "/board/" + id);
@@ -80,14 +92,16 @@ public class BoardController {
     public String update(
             @PathVariable long id,
             Principal principal,
+            @RequestParam(defaultValue = "FREE") String category,
             @RequestParam(defaultValue = "") String title,
             @RequestParam(defaultValue = "") String body,
             Model model,
             HttpServletResponse response) {
         try {
-            posts.update(id, principal.getName(), title, body);
+            posts.update(id, principal.getName(), title, body, category);
             return "redirect:/board/" + id;
         } catch (IllegalArgumentException e) {
+            model.addAttribute("category", category);
             return invalid(title, body, "/board/" + id, e, model, response);
         }
     }
