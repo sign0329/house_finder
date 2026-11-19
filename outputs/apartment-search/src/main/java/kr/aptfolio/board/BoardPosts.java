@@ -7,7 +7,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 @Service
 public class BoardPosts {
@@ -29,8 +33,11 @@ public class BoardPosts {
             LocalDateTime updatedAt) {}
 
     private static final String SELECT =
-            "select p.*,u.username,u.nickname from board_post p join user_account u on"
-                    + " u.id=p.user_id";
+            """
+            select p.*, u.username, u.nickname
+            from board_post p
+            join user_account u on u.id=p.user_id
+            """;
     private final org.springframework.jdbc.core.RowMapper<Post> mapper =
             (r, n) ->
                     new Post(
@@ -119,9 +126,12 @@ public class BoardPosts {
         var key = new GeneratedKeyHolder();
         int rows =
                 db.update(
-                        "insert into board_post(user_id,title,body,category) select"
-                                + " id,:title,:body,:category from user_account where"
-                                + " username=:username",
+                        """
+insert into board_post(user_id, title, body, category) select id, :title, :body,
+:category
+from user_account
+where username=:username
+""",
                         new org.springframework.jdbc.core.namedparam.MapSqlParameterSource(
                                 Map.of(
                                         "username",
@@ -150,10 +160,15 @@ public class BoardPosts {
         validate(title, body);
         int rows =
                 db.update(
-                        "update board_post set"
-                            + " title=:title,body=:body,category=:category,updated_at=CURRENT_TIMESTAMP"
-                            + " where id=:id and hidden=false and user_id=(select id from"
-                            + " user_account where username=:username)",
+                        """
+update board_post
+set title=:title, body=:body, category=:category, updated_at=CURRENT_TIMESTAMP
+where id=:id
+and hidden=false
+and user_id=(select id
+from user_account
+where username=:username)
+""",
                         Map.of(
                                 "id",
                                 id,
@@ -171,8 +186,15 @@ public class BoardPosts {
     public void delete(long id, String username) {
         owned(id, username);
         db.update(
-                "delete from board_post where id=:id and hidden=false and user_id=(select id from"
-                        + " user_account where username=:username)",
+                """
+                delete
+                from board_post
+                where id=:id
+                and hidden=false
+                and user_id=(select id
+                from user_account
+                where username=:username)
+                """,
                 Map.of("id", id, "username", username));
     }
 }
