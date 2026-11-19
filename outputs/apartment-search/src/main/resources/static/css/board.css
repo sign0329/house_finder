@@ -16,3 +16,6 @@
 .board-form textarea.comment-over-limit { border:2px solid #b42318; color:#b42318; }
 #comment-count.comment-over-limit { color:#b42318; font-weight:700; }
 .board-form button:disabled { opacity:.55; cursor:not-allowed; }
+
+.board-form select { padding:12px; border:1px solid #bbc5bd; border-radius:8px; font:inherit; background:white; }
+.board-category { display:inline-block; color:#315e4d; background:#edf3e8; padding:4px 10px; border-radius:6px; font-size:14px; }
