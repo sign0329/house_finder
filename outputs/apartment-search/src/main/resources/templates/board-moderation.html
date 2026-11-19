@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head><th:block th:replace="~{fragments :: head('게시판 신고 관리')}"></th:block><link rel="stylesheet" href="/css/board.css"></head>
+<body><header th:replace="~{fragments :: header('moderation')}"></header>
+<main id="main-content" class="board-shell"><h1>게시판 신고 관리</h1><p>신고는 자동 숨김 처리되지 않습니다. 내용을 검토한 뒤 조치하세요. 숨김은 원문을 보존하며 복원할 수 있습니다.</p><a href="/admin">수집 관리로 이동</a>
+<form class="board-actions" method="get" action="/admin/board"><label>처리 상태 <select name="status"><option value="ALL" th:selected="${filter=='ALL'}">전체</option><option value="OPEN" th:selected="${filter=='OPEN'}">접수</option><option value="HIDDEN" th:selected="${filter=='HIDDEN'}">숨김 처리</option><option value="RESTORED" th:selected="${filter=='RESTORED'}">복원 처리</option><option value="DISMISSED" th:selected="${filter=='DISMISSED'}">기각</option></select></label><button class="board-button">조회</button></form>
+<p th:if="${#lists.isEmpty(reports)}">신고 내역이 없습니다.</p>
+<article class="board-card" th:each="report : ${reports}">
+<h2><span th:text="${report.target_type=='POST'?'게시글':'댓글'}"></span> 신고 #<span th:text="${report.id}"></span></h2>
+<p>신고자: <span th:text="${report.reporter_name}"></span> · <time th:text="${report.created_at}"></time></p>
+<p>신고 처리: <strong th:text="${report.status=='OPEN'?'접수':(report.status=='HIDDEN'?'숨김 처리':(report.status=='RESTORED'?'복원 처리':'기각'))}"></strong> · 대상 현재 상태: <strong th:text="${report.target_hidden==null?'삭제됨':(report.target_hidden?'숨김':'공개')}"></strong></p>
+<h3>신고 사유</h3><p class="board-body" th:text="${report.reason}"></p>
+<details><summary>신고 당시 내용</summary><h3 th:text="${report.snapshot_title}"></h3><p class="board-body" th:text="${report.snapshot_body}"></p></details>
+<details th:if="${report.current_body!=null}"><summary>현재 원문 확인</summary><p class="board-body" th:text="${report.current_body}"></p></details>
+<form class="board-form" method="post" th:action="@{/admin/board/reports/{id}(id=${report.id})}">
+<label>처리 사유<textarea name="note" required maxlength="500" rows="2" placeholder="판단 근거를 기록하세요."></textarea></label>
+<div class="board-actions"><button class="board-button" name="action" value="HIDE" th:if="${report.target_hidden!=null and !report.target_hidden}">대상 숨김</button><button class="board-button" name="action" value="RESTORE" th:if="${report.target_hidden!=null and report.target_hidden}">대상 복원</button><button class="board-button" name="action" value="DISMISS">신고 기각</button></div><p>기각은 신고만 종결하며 대상의 숨김 상태는 변경하지 않습니다.</p>
+</form>
+<details th:if="${!#lists.isEmpty(report.events)}"><summary>최근 처리 이력 (최대 20건)</summary><ul><li th:each="event : ${report.events}"><strong th:text="${event.action=='HIDE'?'숨김':(event.action=='RESTORE'?'복원':'기각')}"></strong> · <span th:text="${event.admin_username}"></span> · <time th:text="${event.created_at}"></time><p th:text="${event.note}"></p></li></ul></details>
+</article><nav class="board-actions" aria-label="신고 페이지"><a th:if="${page>0}" th:href="@{/admin/board(status=${filter},page=${page-1})}">이전</a><span th:text="${page+1}+' 페이지'"></span><a th:if="${hasNext}" th:href="@{/admin/board(status=${filter},page=${page+1})}">다음</a></nav>
+</main></body></html>

@@ -45,13 +45,15 @@ public class BoardPosts {
         if (page < 0 || page > 100000)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "페이지 범위를 확인하세요.");
         return db.query(
-                SELECT + " order by p.id desc limit :limit offset :offset",
+                SELECT + " where p.hidden=false order by p.id desc limit :limit offset :offset",
                 Map.of("limit", PAGE_SIZE + 1, "offset", (long) page * PAGE_SIZE),
                 mapper);
     }
 
     public Post get(long id) {
-        return db.query(SELECT + " where p.id=:id", Map.of("id", id), mapper).stream()
+        return db
+                .query(SELECT + " where p.id=:id and p.hidden=false", Map.of("id", id), mapper)
+                .stream()
                 .findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
@@ -93,8 +95,8 @@ public class BoardPosts {
         int rows =
                 db.update(
                         "update board_post set title=:title,body=:body,updated_at=CURRENT_TIMESTAMP"
-                                + " where id=:id and user_id=(select id from user_account where"
-                                + " username=:username)",
+                                + " where id=:id and hidden=false and user_id=(select id from"
+                                + " user_account where username=:username)",
                         Map.of("id", id, "username", username, "title", title, "body", body));
         if (rows != 1) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
@@ -102,8 +104,8 @@ public class BoardPosts {
     public void delete(long id, String username) {
         owned(id, username);
         db.update(
-                "delete from board_post where id=:id and user_id=(select id from user_account where"
-                        + " username=:username)",
+                "delete from board_post where id=:id and hidden=false and user_id=(select id from"
+                        + " user_account where username=:username)",
                 Map.of("id", id, "username", username));
     }
 }

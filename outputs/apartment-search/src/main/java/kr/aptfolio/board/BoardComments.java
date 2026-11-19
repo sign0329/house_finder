@@ -25,8 +25,9 @@ public class BoardComments {
         if (page < 0 || page > 100000) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         return db.query(
                 "select c.id,u.username,u.nickname,c.body,c.created_at from board_comment c join"
-                    + " user_account u on u.id=c.user_id where c.post_id=:postId order by c.id desc"
-                    + " limit 21 offset :offset",
+                    + " user_account u on u.id=c.user_id where c.post_id=:postId and c.hidden=false"
+                    + " and exists(select 1 from board_post p where p.id=c.post_id and"
+                    + " p.hidden=false) order by c.id desc limit 21 offset :offset",
                 Map.of("postId", postId, "offset", (long) page * 20),
                 (r, n) ->
                         new Comment(
@@ -45,7 +46,8 @@ public class BoardComments {
         int rows =
                 db.update(
                         "insert into board_comment(post_id,user_id,body) select :postId,id,:body"
-                                + " from user_account where username=:username",
+                            + " from user_account where username=:username and exists(select 1 from"
+                            + " board_post where id=:postId and hidden=false)",
                         Map.of("postId", postId, "username", username, "body", body));
         if (rows != 1) throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
