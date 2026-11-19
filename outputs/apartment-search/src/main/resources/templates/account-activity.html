@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head><th:block th:replace="~{fragments :: head('내 게시판 활동')}"></th:block><link rel="stylesheet" href="/css/board.css"></head>
+<body><header th:replace="~{fragments :: header('account')}"></header><main id="main-content" class="board-shell">
+<a href="/account">← 마이페이지</a><h1>내 게시판 활동</h1><p>내가 작성한 글과 댓글을 최신순으로 확인할 수 있어요. 삭제되거나 숨김 처리된 글·댓글은 표시하지 않습니다.</p>
+<nav class="board-actions" aria-label="활동 종류"><a class="board-button" href="/account/activity?type=posts" th:attr="aria-current=${type=='posts'?'page':null}">내가 쓴 글</a><a class="board-button" href="/account/activity?type=comments" th:attr="aria-current=${type=='comments'?'page':null}">내가 쓴 댓글</a></nav>
+<section class="board-card"><h2 th:text="${type=='posts'?'내가 쓴 글':'내가 쓴 댓글'}"></h2><p th:if="${#lists.isEmpty(items)}">표시할 활동이 없습니다. 게시판에서 이야기를 나눠보세요.</p>
+<article class="board-row" th:each="item : ${items}"><h3><a th:href="@{/board/{id}(id=${item.postId})}" th:text="${item.title}"></a></h3><p class="board-body" th:text="${item.excerpt}"></p><p><time th:text="${#temporals.format(item.createdAt,'yyyy-MM-dd HH:mm')}"></time></p><a th:href="@{/board/{id}(id=${item.postId})} + (${type=='comments'}?'#comments':'')">게시글로 이동 →</a></article></section>
+<nav class="board-actions" aria-label="활동 페이지"><a th:if="${page>0}" th:href="@{/account/activity(type=${type},page=${page-1})}">이전</a><span th:text="${page+1}+' 페이지'"></span><a th:if="${hasNext}" th:href="@{/account/activity(type=${type},page=${page+1})}">다음</a></nav><a href="/board">게시판 둘러보기 →</a>
+</main></body></html>
