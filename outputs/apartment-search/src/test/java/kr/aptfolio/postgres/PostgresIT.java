@@ -77,6 +77,24 @@ class PostgresIT {
     }
 
     @Test
+    void accountBoardActivityOnPostgres() {
+        db.update(
+                "insert into user_account(username,nickname,password_hash)"
+                        + " values('pg_activity','회원','unused')");
+        var jdbc = new org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate(db);
+        var posts = new kr.aptfolio.board.BoardPosts(jdbc);
+        var comments = new kr.aptfolio.board.BoardComments(jdbc, posts);
+        var activity = new kr.aptfolio.account.BoardActivity(jdbc);
+        long id = posts.create("pg_activity", "내 글", "본문");
+        comments.create(id, "pg_activity", "내 댓글");
+        assertEquals(id, activity.list("pg_activity", "posts", 0).getFirst().postId());
+        assertEquals("내 댓글", activity.list("pg_activity", "comments", 0).getFirst().excerpt());
+        assertTrue(activity.list("other", "posts", 0).isEmpty());
+        posts.delete(id, "pg_activity");
+        assertTrue(activity.list("pg_activity", "comments", 0).isEmpty());
+    }
+
+    @Test
     void boardCategorySearchOnPostgres() {
         db.update(
                 "insert into user_account(username,nickname,password_hash)"
