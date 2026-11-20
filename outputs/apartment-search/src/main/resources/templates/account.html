@@ -47,6 +47,7 @@
             <div class="profile-section-heading">
                 <h2 id="bookmarks-title">관심 아파트 <span class="count" th:text="${#lists.size(bookmarks)}">0</span></h2>
                 <a href="/saved" class="secondary">관심 목록 관리</a>
+                <a href="/account/alerts" class="secondary">목표 가격 알림 →</a>
             </div>
             <p class="account-help">내 계정에 저장한 아파트입니다. 다른 기기에서도 로그인해 확인할 수 있어요.</p>
             <div class="empty" th:if="${#lists.isEmpty(bookmarks)}">

@@ -56,6 +56,7 @@ class PostgresIT {
     @Autowired kr.aptfolio.bookmark.Bookmarks bookmarks;
     @Autowired kr.aptfolio.collection.jobs.CollectionCoverage coverage;
     @Autowired MockMvc mvc;
+    @Autowired kr.aptfolio.notification.PriceAlerts priceAlerts;
     static final YearMonth MONTH = YearMonth.of(2026, 9);
 
     @BeforeEach
@@ -74,6 +75,32 @@ class PostgresIT {
 
     private static MolitXml.Item item(String name) {
         return item(name, 82500, LocalDate.of(2026, 9, 15), false);
+    }
+
+    @Test
+    void priceAlertsPublishOnceWithSnapshotOnPostgres() {
+        db.update(
+                "insert into user_account(username,nickname,password_hash)"
+                        + " values('pg_alert','알림','unused')");
+        var oldTrade = item("알림", 40000, MONTH.atDay(1), false);
+        var newTrade = item("알림", 45000, MONTH.atDay(2), false);
+        store.replace(MONTH, List.of(oldTrade));
+        long bookmark =
+                bookmarks.save("pg_alert", db.queryForObject("select id from trade", Long.class));
+        priceAlerts.configure("pg_alert", bookmark, 50000);
+        assertThrows(
+                DataIntegrityViolationException.class,
+                () ->
+                        store.replace(
+                                MONTH, List.of(newTrade, item("알림", -1, MONTH.atDay(3), false))));
+        assertTrue(priceAlerts.list("pg_alert", 0).items().isEmpty());
+        store.replace(MONTH, List.of(oldTrade, newTrade));
+        store.replace(MONTH, List.of(oldTrade, newTrade));
+        assertEquals(1, priceAlerts.list("pg_alert", 0).unread());
+        long id = priceAlerts.list("pg_alert", 0).items().getFirst().id();
+        priceAlerts.markRead("pg_alert", id);
+        assertEquals(0, priceAlerts.list("pg_alert", 0).unread());
+        bookmarks.remove("pg_alert", bookmark);
     }
 
     @Test
@@ -444,7 +471,7 @@ class PostgresIT {
         assertTrue(
                 db.queryForObject("select version()", String.class).startsWith("PostgreSQL 17."));
         assertEquals(
-                14,
+                15,
                 db.queryForObject(
                         "select count(*) from flyway_schema_history where success=true and"
                                 + " type='SQL'",
