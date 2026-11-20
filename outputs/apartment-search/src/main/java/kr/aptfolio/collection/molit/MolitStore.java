@@ -16,8 +16,10 @@ import java.util.UUID;
 @Service
 public class MolitStore {
     private final JdbcTemplate db;
+    private final kr.aptfolio.notification.PriceAlerts alerts;
 
-    public MolitStore(JdbcTemplate db) {
+    public MolitStore(JdbcTemplate db, kr.aptfolio.notification.PriceAlerts alerts) {
+        this.alerts = alerts;
         this.db = db;
     }
 
@@ -85,6 +87,7 @@ public class MolitStore {
                         + " last_month=?,last_count=?,updated_at=CURRENT_TIMESTAMP where id=1",
                 ym,
                 count);
+        alerts.publish(region.code(), ym, snapshot);
         return count;
     }
 

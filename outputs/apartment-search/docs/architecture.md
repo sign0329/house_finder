@@ -88,3 +88,7 @@ bookmark 패키지가 세션 사용자 기준의 저장·조회·삭제를 담�
 ## 회원 게시판
 
 board 패키지의 BoardController → BoardPosts → JDBC 경로로 처리함. V11 board_post는 user_account를 참조하며 권한은 USER 세션 및 작성자 조건으로 제한함.
+
+## 목표 가격 알림
+
+notification 패키지가 목표 가격 설정·알림함·읽음 처리를 담당함. V15를 사용하며 MolitStore의 스냅샷 트랜잭션 안에서 알림을 저장함. [동시성·중복 방지 정책](price-alerts.md)을 따름.
