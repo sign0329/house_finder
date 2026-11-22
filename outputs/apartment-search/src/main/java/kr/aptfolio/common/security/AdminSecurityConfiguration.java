@@ -110,10 +110,41 @@ public class AdminSecurityConfiguration {
     @Bean
     @Order(3)
     SecurityFilterChain publicPages(
-            HttpSecurity http, kr.aptfolio.account.UserAccounts users, PasswordEncoder encoder)
+            HttpSecurity http,
+            kr.aptfolio.account.UserAccounts users,
+            PasswordEncoder encoder,
+            kr.aptfolio.account.SocialOAuthUsers socialUsers,
+            org.springframework.beans.factory.ObjectProvider<
+                            org.springframework.security.oauth2.client.registration
+                                    .ClientRegistrationRepository>
+                    registrations)
             throws Exception {
-        return http.authenticationManager(manager(users::loadUserByUsername, encoder))
-                .authorizeHttpRequests(
+        var passwordProvider =
+                new org.springframework.security.authentication.dao.DaoAuthenticationProvider(
+                        users::loadUserByUsername);
+        passwordProvider.setPasswordEncoder(encoder);
+        http.authenticationProvider(passwordProvider);
+        // Do not fall back to the administrator AuthenticationManager on the public login page.
+        http.getSharedObject(
+                        org.springframework.security.config.annotation.authentication.builders
+                                .AuthenticationManagerBuilder.class)
+                .parentAuthenticationManager(
+                        authentication -> {
+                            throw new org.springframework.security.authentication
+                                    .BadCredentialsException("로그인 실패");
+                        });
+        if (registrations.getIfAvailable() != null) {
+            http.oauth2Login(
+                    o ->
+                            o.loginPage("/login")
+                                    .userInfoEndpoint(
+                                            u ->
+                                                    u.userService(socialUsers::kakao)
+                                                            .oidcUserService(socialUsers::google))
+                                    .defaultSuccessUrl("/", true)
+                                    .failureUrl("/login?socialError"));
+        }
+        return http.authorizeHttpRequests(
                         a ->
                                 a.requestMatchers(
                                                 "/board",

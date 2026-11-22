@@ -56,6 +56,7 @@ class PostgresIT {
     @Autowired kr.aptfolio.bookmark.Bookmarks bookmarks;
     @Autowired kr.aptfolio.collection.jobs.CollectionCoverage coverage;
     @Autowired MockMvc mvc;
+    @Autowired kr.aptfolio.account.SocialAccounts socialAccounts;
     @Autowired kr.aptfolio.notification.PriceAlerts priceAlerts;
     static final YearMonth MONTH = YearMonth.of(2026, 9);
 
@@ -75,6 +76,28 @@ class PostgresIT {
 
     private static MolitXml.Item item(String name) {
         return item(name, 82500, LocalDate.of(2026, 9, 15), false);
+    }
+
+    @Test
+    void concurrentSocialRegistrationIsUniqueOnPostgres() throws Exception {
+        var gate = new CountDownLatch(1);
+        try (var pool = Executors.newFixedThreadPool(2)) {
+            java.util.concurrent.Callable<String> login =
+                    () -> {
+                        gate.await();
+                        return socialAccounts.resolve("google", "pg-subject");
+                    };
+            var first = pool.submit(login);
+            var second = pool.submit(login);
+            gate.countDown();
+            assertEquals(first.get(10, TimeUnit.SECONDS), second.get(10, TimeUnit.SECONDS));
+        }
+        assertEquals(
+                1,
+                db.queryForObject(
+                        "select count(*) from social_identity where provider='google' and"
+                                + " subject='pg-subject'",
+                        Integer.class));
     }
 
     @Test
@@ -471,7 +494,7 @@ class PostgresIT {
         assertTrue(
                 db.queryForObject("select version()", String.class).startsWith("PostgreSQL 17."));
         assertEquals(
-                15,
+                16,
                 db.queryForObject(
                         "select count(*) from flyway_schema_history where success=true and"
                                 + " type='SQL'",

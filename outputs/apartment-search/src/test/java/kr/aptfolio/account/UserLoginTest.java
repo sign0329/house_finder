@@ -148,7 +148,14 @@ class UserLoginTest {
     void anonymousAccountIsProtectedAndAuthPostsRequireCsrf() throws Exception {
         mvc.perform(get("/account")).andExpect(redirectedUrl("/login"));
         mvc.perform(get("/")).andExpect(status().isOk());
-        mvc.perform(get("/login")).andExpect(status().isOk());
+        mvc.perform(get("/login"))
+                .andExpect(status().isOk())
+                .andExpect(
+                        content()
+                                .string(
+                                        org.hamcrest.Matchers.not(
+                                                org.hamcrest.Matchers.containsString(
+                                                        "/oauth2/authorization/"))));
         mvc.perform(get("/signup")).andExpect(status().isOk());
         mvc.perform(post("/signup")).andExpect(status().isForbidden());
         mvc.perform(post("/login")).andExpect(status().isForbidden());

@@ -54,6 +54,7 @@ public class UserAccounts {
                         (r, n) ->
                                 User.withUsername(r.getString("username"))
                                         .password(r.getString("password_hash"))
+                                        .disabled("!SOCIAL".equals(r.getString("password_hash")))
                                         .roles("USER")
                                         .build())
                 .stream()

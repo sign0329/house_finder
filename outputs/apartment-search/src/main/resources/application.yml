@@ -19,7 +19,7 @@ server:
       tracking-modes: cookie
       cookie:
         http-only: true
-        same-site: strict
+        same-site: lax
         secure: ${ADMIN_COOKIE_SECURE:false}
   forward-headers-strategy: none
   max-http-request-header-size: 8KB

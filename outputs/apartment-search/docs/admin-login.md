@@ -18,7 +18,7 @@ IntelliJ 환경 변수 편집기에는 해시 자체를 입력하고 따옴표�
 
 앱 재시작 후 `/admin/login`에서 입력한 원래 비밀번호로 로그인한다. 서버에는 해시만 제공한다. 비밀번호 변경은 새 해시로 설정 후 앱을 재시작한다. 계정은 메모리에 구성되지만 환경 설정이 유지되므로 재시작 후에도 동일 계정으로 로그인할 수 있다. 로그인 세션은 재시작 후 다시 발급받는다.
 
-Compose 앱 서비스에 활성화·아이디·해시 설정을 전달하도록 구성했다. production Compose는 Secure 쿠키를 사용하므로 HTTPS로 접속한다. 로컬 Compose는 HTTP를 위해 Secure=false다. 직접 HTTPS 배포 시 ADMIN_COOKIE_SECURE=true를 설정한다. 브라우저에는 HttpOnly, SameSite=Strict 쿠키를 사용하며 세션 유휴 만료 시간은 30분이다.
+Compose 앱 서비스에 활성화·아이디·해시 설정을 전달하도록 구성했다. production Compose는 Secure 쿠키를 사용하므로 HTTPS로 접속한다. 로컬 Compose는 HTTP를 위해 Secure=false다. 직접 HTTPS 배포 시 ADMIN_COOKIE_SECURE=true를 설정한다. 브라우저에는 HttpOnly, SameSite=Lax 쿠키를 사용하며 세션 유휴 만료 시간은 30분이다.
 
 기본 Compose 앱은 공공 API 키를 전달하지 않아 로그인과 조회만 가능하다. 웹 수집까지 사용할 경우 서버 환경에 MOLIT_SERVICE_KEY를 명시적으로 전달해야 한다. 기존 importer는 별도 실행하며 인증 설정을 요구하지 않는다.
 
