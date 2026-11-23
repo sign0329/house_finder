@@ -5,3 +5,5 @@
 .social-logins{display:grid;gap:12px;margin-bottom:24px}.social-login{display:block;text-align:center;padding:14px;border-radius:8px;font-weight:600;text-decoration:none}.social-kakao{background:#fee500;color:#191919}.social-google{background:#fff;color:#1f1f1f;border:1px solid #747775}.social-login:focus-visible{outline:3px solid #1a73e8;outline-offset:3px}
 
 button.social-login{width:100%;font:inherit;font-weight:600}button.social-kakao{border:1px solid #fee500}.social-login:disabled{cursor:not-allowed;opacity:.7}
+
+.account-card form + .social-logins{margin-top:16px}
